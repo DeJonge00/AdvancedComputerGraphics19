@@ -18,7 +18,7 @@ MainView::~MainView() {
     clearArrays();
 
     glDeleteBuffers(1, &netCoordsBO);
-//    glDeleteBuffers(1, &interpolatedCoordsBO);
+    glDeleteBuffers(1, &interpolatedCoordsBO);
     glDeleteVertexArrays(1, &netVAO);
     glDeleteVertexArrays(1, &interpolatedVAO);
 
@@ -64,12 +64,15 @@ void MainView::createBuffers() {
 }
 
 void MainView::updateBuffers() {
+    interpolatedCoords = generateCurvePoints(netCoords);
+    netCoordsADJ = linesToAdjacentLines(netCoords);
+    interpolatedCoordsADJ = linesToAdjacentLines(interpolatedCoords);
 
     glBindBuffer(GL_ARRAY_BUFFER, netCoordsBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoords.size(), netCoords.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoordsADJ.size(), netCoordsADJ.data(), GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, interpolatedCoordsBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*interpolatedCoords.size(), interpolatedCoords.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*interpolatedCoordsADJ.size(), interpolatedCoordsADJ.data(), GL_DYNAMIC_DRAW);
 
     update();
 
@@ -154,6 +157,25 @@ QVector<QVector2D> MainView::generateCurvePoints(QVector<QVector2D> ctrlpoints) 
     return c;
 }
 
+QVector<QVector2D> MainView::linesToAdjacentLines(QVector<QVector2D> lines) {
+    QVector<QVector2D> r = QVector<QVector2D>();
+    r.append(lines.last());
+    r.append(lines.first());
+    r.append(lines[1]);
+    r.append(lines[2]);
+    for (int i = 0; i < lines.size() - 3; i++) {
+        r.append(lines[i]);
+        r.append(lines[i+1]);
+        r.append(lines[i+2]);
+        r.append(lines[i+3]);
+    }
+    r.append(lines[lines.size()-3]);
+    r.append(lines[lines.size()-2]);
+    r.append(lines.last());
+    r.append(lines.first());
+    return r;
+}
+
 void MainView::paintGL() {
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -169,9 +191,9 @@ void MainView::paintGL() {
         glBindVertexArray(netVAO);
 
         // Draw control net
-        glDrawArrays(GL_LINE_STRIP, 0, netCoords.size());
+        glDrawArrays(GL_LINES_ADJACENCY, 0, netCoordsADJ.size());
         glPointSize(8.0);
-        glDrawArrays(GL_POINTS, 0, netCoords.size());
+        glDrawArrays(GL_POINTS, 0, netCoordsADJ.size());
 
         // Highlight selected control point
         if (selectedPt > -1) {
@@ -183,11 +205,10 @@ void MainView::paintGL() {
     }
 
     if (showCurvePts) {
-        interpolatedCoords = generateCurvePoints(netCoords);
         glBindVertexArray(interpolatedVAO);
-        glDrawArrays(GL_LINE_STRIP, 0, interpolatedCoords.size());
+        glDrawArrays(GL_LINES_ADJACENCY, 0, interpolatedCoordsADJ.size());
         glPointSize(8.0);
-        glDrawArrays(GL_POINTS, 0, interpolatedCoords.size());
+        glDrawArrays(GL_POINTS, 0, interpolatedCoordsADJ.size());
         glBindVertexArray(0);
     }
 
@@ -224,8 +245,6 @@ void MainView::presetNet(int preset) {
         netCoords.append(QVector2D(1.0, -0.25));
         break;
     }
-
-    interpolatedCoords = generateCurvePoints(netCoords);
 
     updateBuffers();
 

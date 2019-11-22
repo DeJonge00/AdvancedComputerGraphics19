@@ -38,7 +38,7 @@ protected:
 private:
     QOpenGLDebugLogger* debugLogger;
 
-    QVector<QVector2D> netCoords, interpolatedCoords;
+    QVector<QVector2D> netCoords, netCoordsADJ, interpolatedCoords, interpolatedCoordsADJ;
 
     QOpenGLShaderProgram* mainShaderProg;
     GLuint netVAO, interpolatedVAO, netCoordsBO, interpolatedCoordsBO;
@@ -47,6 +47,7 @@ private:
     void createBuffers();
     QVector<QVector2D> generateCurvePoints(QVector<QVector2D> ctrlpoints);
     QVector<QVector2D> interpolateUsingMask(QVector<QVector2D> ctrlpoints, QVector<int> mask);
+    QVector<QVector2D> linesToAdjacentLines(QVector<QVector2D> lines);
 
     bool updateUniformsRequired;
     //GLint uni...

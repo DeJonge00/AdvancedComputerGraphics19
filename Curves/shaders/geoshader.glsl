@@ -2,13 +2,15 @@
 // Geometry shader
 
 layout(lines_adjacency) in;
-layout(line_strip, max_vertices = 15​) out;
+layout(lines, max_vertices = 2) out;
 
 void main() {
-    fColor = vec4(0.8, 0.5, 0.0, 1.0);
-    gl_Position = lines_adjacency[0];
+
+    gl_Position = gl_PositionIn[0];
     EmitVertex();
-    gl_Position = lines_adjacency[2];
+    gl_Position = gl_PositionIn[3] + vec4(0.0, 1.0, 0.0, 1.0); ;
     EmitVertex();
+
+
     EndPrimitive();
 }
