@@ -41,7 +41,7 @@ private:
     QVector<QVector2D> netCoords, interpolatedCoords;
 
     QOpenGLShaderProgram* mainShaderProg;
-    GLuint netVAO, netCoordsBO, interpolatedCoordsBO;
+    GLuint netVAO, interpolatedVAO, netCoordsBO, interpolatedCoordsBO;
 
     void createShaderPrograms();
     void createBuffers();

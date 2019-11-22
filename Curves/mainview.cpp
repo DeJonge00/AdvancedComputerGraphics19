@@ -18,8 +18,9 @@ MainView::~MainView() {
     clearArrays();
 
     glDeleteBuffers(1, &netCoordsBO);
-    glDeleteBuffers(1, &interpolatedCoordsBO);
+//    glDeleteBuffers(1, &interpolatedCoordsBO);
     glDeleteVertexArrays(1, &netVAO);
+    glDeleteVertexArrays(1, &interpolatedVAO);
 
     delete mainShaderProg;
     delete debugLogger;
@@ -33,7 +34,7 @@ void MainView::createShaderPrograms() {
     mainShaderProg = new QOpenGLShaderProgram();
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
-    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/fragshader_copy.glsl");
+    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/geoshader.glsl");
 
     mainShaderProg->link();
 
@@ -51,6 +52,9 @@ void MainView::createBuffers() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glGenVertexArrays(1, &interpolatedVAO);
+    glBindVertexArray(interpolatedVAO);
+
     glGenBuffers(1, &interpolatedCoordsBO);
     glBindBuffer(GL_ARRAY_BUFFER, interpolatedCoordsBO);
     glEnableVertexAttribArray(0);
@@ -65,7 +69,7 @@ void MainView::updateBuffers() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoords.size(), netCoords.data(), GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, interpolatedCoordsBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoords.size(), netCoords.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*interpolatedCoords.size(), interpolatedCoords.data(), GL_DYNAMIC_DRAW);
 
     update();
 
@@ -130,7 +134,7 @@ QVector<QVector2D> MainView::interpolateUsingMask(QVector<QVector2D> ctrlpoints,
     for (int i = 0; i < len; i++) {
         QVector2D v = QVector2D();
         for (int j = 0; j < mask.size(); j++) {
-            v += (ctrlpoints[i + j] /  sum);
+            v += (mask[j] * ctrlpoints[i + j] /  sum);
         }
         vs1[i] = v;
     }
@@ -147,7 +151,6 @@ QVector<QVector2D> MainView::generateCurvePoints(QVector<QVector2D> ctrlpoints) 
     for(int i = 0; i < c2.size(); i++) {
         c[2*i+1] = c2[i];
     }
-    qDebug() << c;
     return c;
 }
 
@@ -180,7 +183,12 @@ void MainView::paintGL() {
     }
 
     if (showCurvePts) {
+        interpolatedCoords = generateCurvePoints(netCoords);
+        glBindVertexArray(interpolatedVAO);
         glDrawArrays(GL_LINE_STRIP, 0, interpolatedCoords.size());
+        glPointSize(8.0);
+        glDrawArrays(GL_POINTS, 0, interpolatedCoords.size());
+        glBindVertexArray(0);
     }
 
     mainShaderProg->release();
