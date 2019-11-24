@@ -32,7 +32,7 @@ void MainWindow::on_controlNet_toggled(bool checked) {
 
 void MainWindow::on_curvePoints_toggled(bool checked) {
     ui->mainView->showCurvePts = checked;
-    ui->mainView->update();
+    ui->mainView->updateAll();
 }
 
 void MainWindow::on_netPresets_currentIndexChanged(int index) {

@@ -10,8 +10,9 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     showNet = true;
     updateUniformsRequired = true;
     selectedPt = -1;
-    combs = false;
+    combs = true;
     steps = 1;
+    selected_circle = 0;
 }
 
 MainView::~MainView() {
@@ -49,7 +50,6 @@ void MainView::createShaderPrograms() {
 }
 
 void MainView::createBuffers() {
-
     // Pure OpenGL
     glGenVertexArrays(1, &netVAO);
     glBindVertexArray(netVAO);
@@ -58,25 +58,18 @@ void MainView::createBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, netCoordsBO);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
     glGenVertexArrays(1, &interpolatedVAO);
     glBindVertexArray(interpolatedVAO);
 
+    // Add another BO for the generated curve
     glGenBuffers(1, &interpolatedCoordsBO);
     glBindBuffer(GL_ARRAY_BUFFER, interpolatedCoordsBO);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
     glBindVertexArray(0);
 }
 
 void MainView::updateBuffers() {
-    QVector<QVector2D> interpolatedCoords = netCoords;
-    for (int i = 0; i < steps; i++) {
-        interpolatedCoords = generateCurvePoints(interpolatedCoords);
-    }
-    interpolatedCoordsADJ = linesToAdjacentLines(interpolatedCoords);
-
     glBindBuffer(GL_ARRAY_BUFFER, netCoordsBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoords.size(), netCoords.data(), GL_DYNAMIC_DRAW);
 
@@ -87,25 +80,36 @@ void MainView::updateBuffers() {
 
 }
 
-void MainView::updateUniforms() {
+void MainView::updateAll() {
+    if (updateUniformsRequired) {
+        updateUniforms();
+    }
+    // Generate the curve from the control points, up to 'steps' layers
+    QVector<QVector2D> interpolatedCoords = netCoords;
+    for (int i = 0; i < steps; i++) {
+        interpolatedCoords = generateCurvePoints(interpolatedCoords);
+    }
+    interpolatedCoordsADJ = linesToAdjacentLines(interpolatedCoords);
 
-    //  glUniform...();
+    updateBuffers();
+}
+
+void MainView::updateUniforms() {
+    //  set the value of the uniforms used in the geoshader
+    curveShaderProg->bind();
     curveShaderProg->setUniformValue("combs", combs);
-    curveShaderProg->setUniformValue("circle", true);
-    curveShaderProg->setUniformValue("selected_circle", 1);
-    updateUniformsRequired = true;
+    curveShaderProg->setUniformValue("selected_circle", selected_circle);
+    curveShaderProg->release();
+    updateUniformsRequired = false;
 }
 
 void MainView::clearArrays() {
-
     // As of Qt 5.6, clear() does not release the memory anymore. Use e.g. squeeze()
     netCoords.clear();
     netCoords.squeeze();
     interpolatedCoords.clear();
     interpolatedCoords.squeeze();
 }
-
-// ---
 
 void MainView::initializeGL() {
 
@@ -133,14 +137,13 @@ void MainView::initializeGL() {
     // Default is GL_LESS
     glDepthFunc(GL_LEQUAL);
 
-    // ---
-
     createShaderPrograms();
     createBuffers();
 
     presetNet(0);
 }
 
+// Based on a given mask, determine the points of the new curve
 QVector<QVector2D> MainView::interpolateUsingMask(QVector<QVector2D> ctrlpoints, QVector<int> mask) {
     int len = ctrlpoints.size() - mask.size() + 1;
     int sum = std::accumulate(mask.begin(), mask.end(), 0);
@@ -155,10 +158,14 @@ QVector<QVector2D> MainView::interpolateUsingMask(QVector<QVector2D> ctrlpoints,
     return vs1;
 }
 
+// Combine two masks to create a curve from control points
 QVector<QVector2D> MainView::generateCurvePoints(QVector<QVector2D> ctrlpoints) {
+    // Generate points
     QVector<QVector2D> c1 = interpolateUsingMask(ctrlpoints, firstStencil);
     QVector<QVector2D> c2 = interpolateUsingMask(ctrlpoints, secondStencil);
     QVector<QVector2D> c = QVector<QVector2D>(c1.size() + c2.size());
+
+    // Alternate points
     for(int i = 0; i < c1.size(); i++) {
         c[2*i] = c1[i];
     }
@@ -168,6 +175,7 @@ QVector<QVector2D> MainView::generateCurvePoints(QVector<QVector2D> ctrlpoints) 
     return c;
 }
 
+// Given a line of points, construct a set of adjacent poitns to feed to the geoshader
 QVector<QVector2D> MainView::linesToAdjacentLines(QVector<QVector2D> lines) {
     QVector<QVector2D> r = QVector<QVector2D>();
     r.append(lines.last());
@@ -215,18 +223,16 @@ void MainView::paintGL() {
         glBindVertexArray(0);
     }
     mainShaderProg->release();
-    curveShaderProg->bind();
 
+    // Use the geoshader
+    curveShaderProg->bind();
     if (showCurvePts) {
         glBindVertexArray(interpolatedVAO);
         glDrawArrays(GL_LINES_ADJACENCY, 0, interpolatedCoordsADJ.size());
         glBindVertexArray(0);
     }
-
     curveShaderProg->release();
 }
-
-// ---
 
 void MainView::presetNet(int preset) {
     selectedPt = -1;
@@ -257,8 +263,7 @@ void MainView::presetNet(int preset) {
         break;
     }
 
-    updateBuffers();
-
+    updateAll();
 }
 
 void MainView::setMask(QString stringMask) {
@@ -344,34 +349,29 @@ void MainView::mouseMoveEvent(QMouseEvent *event) {
 
         // Update position of the control point
         netCoords[selectedPt] = QVector2D(xScene, yScene);
-        updateBuffers();
+        updateAll();
     }
 }
 
+// GUI functions to set variables
 void MainView::setCombs(int c) {
-    if (c == 2) {
-        combs = true;
-    } else {
-        combs = false;
-    }
+    combs = c == 2;
     updateUniformsRequired = true;
-    updateBuffers();
-    update();
+    updateAll();
 }
 
 void MainView::setSteps(int s) {
     steps = s;
-    updateBuffers();
-    update();
+    updateAll();
 }
 
 void MainView::setSelectedCircle(int s) {
     selected_circle = s;
-    qDebug() << s;
-    updateBuffers();
-    update();
+    updateUniformsRequired = true;
+    updateAll();
 }
 
+// Interaction functions
 void MainView::keyPressEvent(QKeyEvent *event) {
 
     // Only works when the widget has focus!
@@ -388,7 +388,7 @@ void MainView::keyPressEvent(QKeyEvent *event) {
             // Remove selected control point
             netCoords.remove(selectedPt);
             selectedPt = -1;
-            updateBuffers();
+            updateAll();
         }
         break;
     }
@@ -411,7 +411,7 @@ int MainView::findClosest(float x, float y) {
     return ptIndex;
 }
 
-// ---
+// Loggin g function
 
 void MainView::onMessageLogged( QOpenGLDebugMessage Message ) {
     qDebug() << " → Log:" << Message;

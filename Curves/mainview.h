@@ -26,6 +26,7 @@ public:
     int findClosest(float x, float y);
 
     void setMask(QString stringMask);
+    void updateAll();
 
 protected:
     void initializeGL();
