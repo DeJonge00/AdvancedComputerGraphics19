@@ -90,9 +90,10 @@ void MainView::updateBuffers() {
 void MainView::updateUniforms() {
 
     //  glUniform...();
-    glUniform1f(glGetUniformLocation(interpolatedVAO, "combs"), combs);
-
-    updateUniformsRequired = false;
+    curveShaderProg->setUniformValue("combs", combs);
+    curveShaderProg->setUniformValue("circle", true);
+    curveShaderProg->setUniformValue("selected_circle", 1);
+    updateUniformsRequired = true;
 }
 
 void MainView::clearArrays() {
@@ -348,9 +349,7 @@ void MainView::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void MainView::setCombs(int c) {
-    qDebug() << "combs" << c;
-
-    if (c == 1) {
+    if (c == 2) {
         combs = true;
     } else {
         combs = false;
@@ -362,6 +361,13 @@ void MainView::setCombs(int c) {
 
 void MainView::setSteps(int s) {
     steps = s;
+    updateBuffers();
+    update();
+}
+
+void MainView::setSelectedCircle(int s) {
+    selected_circle = s;
+    qDebug() << s;
     updateBuffers();
     update();
 }

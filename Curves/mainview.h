@@ -26,8 +26,6 @@ public:
     int findClosest(float x, float y);
 
     void setMask(QString stringMask);
-    void setSteps(int s);
-    void setCombs(int c);
 
 protected:
     void initializeGL();
@@ -36,6 +34,11 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
+private slots:
+    void setSteps(int s);
+    void setCombs(int c);
+    void MainView::setSelectedCircle(int s)
 
 private:
     QOpenGLDebugLogger* debugLogger;
@@ -53,7 +56,7 @@ private:
     QVector<QVector2D> linesToAdjacentLines(QVector<QVector2D> lines);
 
     bool combs;
-    int steps;
+    int steps, selected_circle;
 
     bool updateUniformsRequired;
     //GLint uni...

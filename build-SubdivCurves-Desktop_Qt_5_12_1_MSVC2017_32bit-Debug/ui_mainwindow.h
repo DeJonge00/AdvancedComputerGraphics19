@@ -88,6 +88,7 @@ public:
         curveatureCombs = new QCheckBox(renderGB);
         curveatureCombs->setObjectName(QString::fromUtf8("curveatureCombs"));
         curveatureCombs->setGeometry(QRect(20, 90, 151, 24));
+        curveatureCombs->setChecked(true);
         subdivSteps = new QSpinBox(mainGB);
         subdivSteps->setObjectName(QString::fromUtf8("subdivSteps"));
         subdivSteps->setGeometry(QRect(40, 410, 151, 27));
@@ -121,6 +122,8 @@ public:
         QWidget::setTabOrder(subdivMask, subdivSteps);
 
         retranslateUi(MainWindow);
+        QObject::connect(subdivSteps, SIGNAL(valueChanged(int)), mainView, SLOT(setSteps(int)));
+        QObject::connect(curveatureCombs, SIGNAL(stateChanged(int)), mainView, SLOT(setCombs(int)));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi

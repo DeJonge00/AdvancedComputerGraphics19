@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[10];
-    char stringdata0[166];
+    char stringdata0[163];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,14 +40,14 @@ QT_MOC_LITERAL(5, 65, 33), // "on_netPresets_currentIndexCha..."
 QT_MOC_LITERAL(6, 99, 5), // "index"
 QT_MOC_LITERAL(7, 105, 27), // "on_subdivMask_returnPressed"
 QT_MOC_LITERAL(8, 133, 27), // "on_subdivSteps_valueChanged"
-QT_MOC_LITERAL(9, 161, 4) // "arg1"
+QT_MOC_LITERAL(9, 161, 1) // "s"
 
     },
     "MainWindow\0on_controlNet_toggled\0\0"
     "checked\0on_curvePoints_toggled\0"
     "on_netPresets_currentIndexChanged\0"
     "index\0on_subdivMask_returnPressed\0"
-    "on_subdivSteps_valueChanged\0arg1"
+    "on_subdivSteps_valueChanged\0s"
 };
 #undef QT_MOC_LITERAL
 
