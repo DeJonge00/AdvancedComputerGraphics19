@@ -34,6 +34,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void setCombs(bool enabled);
 
 private:
     QOpenGLDebugLogger* debugLogger;
@@ -41,6 +42,7 @@ private:
     QVector<QVector2D> netCoords, netCoordsADJ, interpolatedCoords, interpolatedCoordsADJ;
 
     QOpenGLShaderProgram* mainShaderProg;
+    QOpenGLShaderProgram* curveShaderProg;
     GLuint netVAO, interpolatedVAO, netCoordsBO, interpolatedCoordsBO;
 
     void createShaderPrograms();
@@ -48,6 +50,8 @@ private:
     QVector<QVector2D> generateCurvePoints(QVector<QVector2D> ctrlpoints);
     QVector<QVector2D> interpolateUsingMask(QVector<QVector2D> ctrlpoints, QVector<int> mask);
     QVector<QVector2D> linesToAdjacentLines(QVector<QVector2D> lines);
+
+    bool combs;
 
     bool updateUniformsRequired;
     //GLint uni...

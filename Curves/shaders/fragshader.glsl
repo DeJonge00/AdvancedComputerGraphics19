@@ -1,10 +1,14 @@
 #version 410
 // Fragment shader
 
+in vec4 gColor;
 out vec4 fColor;
 
 void main() {
 
-  fColor = vec4(0.8, 0.5, 0.0, 1.0);
-
+  if (gColor.xyz == vec3(0)) {
+      fColor = vec4(0.8, 0.0, 0.0, 1.0);
+  } else {
+      fColor = gColor;
+  }
 }

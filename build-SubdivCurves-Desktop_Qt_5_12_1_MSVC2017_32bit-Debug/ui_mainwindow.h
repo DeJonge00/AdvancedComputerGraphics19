@@ -33,6 +33,7 @@ public:
     QGroupBox *renderGB;
     QCheckBox *controlNet;
     QCheckBox *curvePoints;
+    QCheckBox *curveatureCombs;
     QSpinBox *subdivSteps;
     QLabel *maskLabel;
     QLabel *stepsLabel;
@@ -77,31 +78,34 @@ public:
 "}"));
         renderGB = new QGroupBox(mainGB);
         renderGB->setObjectName(QString::fromUtf8("renderGB"));
-        renderGB->setGeometry(QRect(20, 20, 191, 91));
+        renderGB->setGeometry(QRect(20, 20, 191, 121));
         controlNet = new QCheckBox(renderGB);
         controlNet->setObjectName(QString::fromUtf8("controlNet"));
         controlNet->setGeometry(QRect(20, 30, 151, 24));
         curvePoints = new QCheckBox(renderGB);
         curvePoints->setObjectName(QString::fromUtf8("curvePoints"));
         curvePoints->setGeometry(QRect(20, 60, 151, 24));
+        curveatureCombs = new QCheckBox(renderGB);
+        curveatureCombs->setObjectName(QString::fromUtf8("curveatureCombs"));
+        curveatureCombs->setGeometry(QRect(20, 90, 151, 24));
         subdivSteps = new QSpinBox(mainGB);
         subdivSteps->setObjectName(QString::fromUtf8("subdivSteps"));
-        subdivSteps->setGeometry(QRect(40, 330, 151, 27));
+        subdivSteps->setGeometry(QRect(40, 410, 151, 27));
         maskLabel = new QLabel(mainGB);
         maskLabel->setObjectName(QString::fromUtf8("maskLabel"));
-        maskLabel->setGeometry(QRect(40, 220, 151, 18));
+        maskLabel->setGeometry(QRect(40, 300, 151, 18));
         stepsLabel = new QLabel(mainGB);
         stepsLabel->setObjectName(QString::fromUtf8("stepsLabel"));
-        stepsLabel->setGeometry(QRect(40, 300, 151, 18));
+        stepsLabel->setGeometry(QRect(40, 380, 151, 18));
         presetLabel = new QLabel(mainGB);
         presetLabel->setObjectName(QString::fromUtf8("presetLabel"));
-        presetLabel->setGeometry(QRect(40, 140, 151, 18));
+        presetLabel->setGeometry(QRect(40, 220, 151, 18));
         netPresets = new QComboBox(mainGB);
         netPresets->setObjectName(QString::fromUtf8("netPresets"));
-        netPresets->setGeometry(QRect(40, 170, 151, 26));
+        netPresets->setGeometry(QRect(40, 250, 151, 26));
         subdivMask = new QLineEdit(mainGB);
         subdivMask->setObjectName(QString::fromUtf8("subdivMask"));
-        subdivMask->setGeometry(QRect(40, 250, 151, 26));
+        subdivMask->setGeometry(QRect(40, 330, 151, 26));
 
         horizontalLayout->addWidget(mainGB);
 
@@ -128,6 +132,7 @@ public:
         renderGB->setTitle(QApplication::translate("MainWindow", "Render", nullptr));
         controlNet->setText(QApplication::translate("MainWindow", "Control net", nullptr));
         curvePoints->setText(QApplication::translate("MainWindow", "Curve points", nullptr));
+        curveatureCombs->setText(QApplication::translate("MainWindow", "Curvature combs", nullptr));
         maskLabel->setText(QApplication::translate("MainWindow", "Mask", nullptr));
         stepsLabel->setText(QApplication::translate("MainWindow", "Steps", nullptr));
         presetLabel->setText(QApplication::translate("MainWindow", "Preset", nullptr));

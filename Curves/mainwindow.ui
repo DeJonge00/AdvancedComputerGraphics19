@@ -71,7 +71,7 @@ QGroupBox::title {
          <x>20</x>
          <y>20</y>
          <width>191</width>
-         <height>91</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="title">
@@ -103,12 +103,25 @@ QGroupBox::title {
          <string>Curve points</string>
         </property>
        </widget>
+       <widget class="QCheckBox" name="curveatureCombs">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>90</y>
+          <width>151</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Curvature combs</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QSpinBox" name="subdivSteps">
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>330</y>
+         <y>410</y>
          <width>151</width>
          <height>27</height>
         </rect>
@@ -118,7 +131,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>220</y>
+         <y>300</y>
          <width>151</width>
          <height>18</height>
         </rect>
@@ -131,7 +144,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>300</y>
+         <y>380</y>
          <width>151</width>
          <height>18</height>
         </rect>
@@ -144,7 +157,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>140</y>
+         <y>220</y>
          <width>151</width>
          <height>18</height>
         </rect>
@@ -157,7 +170,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>170</y>
+         <y>250</y>
          <width>151</width>
          <height>26</height>
         </rect>
@@ -167,7 +180,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>250</y>
+         <y>330</y>
          <width>151</width>
          <height>26</height>
         </rect>

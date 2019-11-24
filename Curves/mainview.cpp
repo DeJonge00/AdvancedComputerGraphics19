@@ -10,6 +10,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     showNet = true;
     updateUniformsRequired = true;
     selectedPt = -1;
+    combs = false;
 }
 
 MainView::~MainView() {
@@ -34,9 +35,14 @@ void MainView::createShaderPrograms() {
     mainShaderProg = new QOpenGLShaderProgram();
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
-    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/geoshader.glsl");
-
     mainShaderProg->link();
+
+    curveShaderProg = new QOpenGLShaderProgram();
+    curveShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    curveShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
+    curveShaderProg->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/geoshader.glsl");
+    curveShaderProg->link();
+
 
     //  uni... = glGetUniformLocation(mainShaderProg->programId(), "...");
 }
@@ -64,12 +70,15 @@ void MainView::createBuffers() {
 }
 
 void MainView::updateBuffers() {
-    interpolatedCoords = generateCurvePoints(netCoords);
-    netCoordsADJ = linesToAdjacentLines(netCoords);
+    int steps = 4;
+    QVector<QVector2D> interpolatedCoords = netCoords;
+    for (int i = 0; i < steps; i++) {
+        interpolatedCoords = generateCurvePoints(interpolatedCoords);
+    }
     interpolatedCoordsADJ = linesToAdjacentLines(interpolatedCoords);
 
     glBindBuffer(GL_ARRAY_BUFFER, netCoordsBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoordsADJ.size(), netCoordsADJ.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*netCoords.size(), netCoords.data(), GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, interpolatedCoordsBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(QVector2D)*interpolatedCoordsADJ.size(), interpolatedCoordsADJ.data(), GL_DYNAMIC_DRAW);
@@ -81,6 +90,7 @@ void MainView::updateBuffers() {
 void MainView::updateUniforms() {
 
     //  glUniform...();
+    glUniform1f(glGetUniformLocation(interpolatedVAO, "combs"), combs);
 
     updateUniformsRequired = false;
 }
@@ -191,9 +201,9 @@ void MainView::paintGL() {
         glBindVertexArray(netVAO);
 
         // Draw control net
-        glDrawArrays(GL_LINES_ADJACENCY, 0, netCoordsADJ.size());
+        glDrawArrays(GL_LINE_STRIP, 0, netCoords.size());
         glPointSize(8.0);
-        glDrawArrays(GL_POINTS, 0, netCoordsADJ.size());
+        glDrawArrays(GL_POINTS, 0, netCoords.size());
 
         // Highlight selected control point
         if (selectedPt > -1) {
@@ -203,16 +213,16 @@ void MainView::paintGL() {
 
         glBindVertexArray(0);
     }
+    mainShaderProg->release();
+    curveShaderProg->bind();
 
     if (showCurvePts) {
         glBindVertexArray(interpolatedVAO);
         glDrawArrays(GL_LINES_ADJACENCY, 0, interpolatedCoordsADJ.size());
-        glPointSize(8.0);
-        glDrawArrays(GL_POINTS, 0, interpolatedCoordsADJ.size());
         glBindVertexArray(0);
     }
 
-    mainShaderProg->release();
+    curveShaderProg->release();
 }
 
 // ---
@@ -335,6 +345,10 @@ void MainView::mouseMoveEvent(QMouseEvent *event) {
         netCoords[selectedPt] = QVector2D(xScene, yScene);
         updateBuffers();
     }
+}
+
+void MainView::setCombs(bool enabled) {
+    combs = enabled;
 }
 
 void MainView::keyPressEvent(QKeyEvent *event) {
