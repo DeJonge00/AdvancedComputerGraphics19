@@ -38,7 +38,7 @@ protected:
 private slots:
     void setSteps(int s);
     void setCombs(int c);
-    void MainView::setSelectedCircle(int s)
+    void setSelectedCircle(int s);
 
 private:
     QOpenGLDebugLogger* debugLogger;

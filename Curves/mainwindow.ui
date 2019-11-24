@@ -192,6 +192,29 @@ QGroupBox::title {
         <string>1 4 6 4 1</string>
        </property>
       </widget>
+      <widget class="QSpinBox" name="selectedCircle">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>500</y>
+         <width>151</width>
+         <height>27</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="stepsLabel_2">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>470</y>
+         <width>151</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Draw circle on selected curve</string>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -211,6 +234,7 @@ QGroupBox::title {
     <signal>signal1()</signal>
     <slot>setSteps(int)</slot>
     <slot>setCombs(int)</slot>
+    <slot>setSelectedCircle(int)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -248,6 +272,22 @@ QGroupBox::title {
     <hint type="sourcelabel">
      <x>121</x>
      <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>795</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selectedCircle</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mainView</receiver>
+   <slot>setSelectedCircle(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>519</y>
     </hint>
     <hint type="destinationlabel">
      <x>795</x>
