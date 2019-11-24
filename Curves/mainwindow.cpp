@@ -46,6 +46,6 @@ void MainWindow::on_subdivMask_returnPressed() {
     ui->mainView->update();
 }
 
-void MainWindow::on_subdivSteps_valueChanged(int arg1) {
-    // ...
+void MainWindow::on_subdivSteps_valueChanged(int s) {
+    ui->mainView->setSteps(s);
 }

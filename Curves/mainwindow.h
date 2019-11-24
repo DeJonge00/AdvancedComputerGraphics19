@@ -20,7 +20,7 @@ private slots:
   void on_curvePoints_toggled(bool checked);
   void on_netPresets_currentIndexChanged(int index);
   void on_subdivMask_returnPressed();
-  void on_subdivSteps_valueChanged(int arg1);
+  void on_subdivSteps_valueChanged(int s);
 
 private:
   Ui::MainWindow *ui;

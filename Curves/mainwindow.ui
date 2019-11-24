@@ -115,6 +115,9 @@ QGroupBox::title {
         <property name="text">
          <string>Curvature combs</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </widget>
       <widget class="QSpinBox" name="subdivSteps">
@@ -203,6 +206,12 @@ QGroupBox::title {
    <class>MainView</class>
    <extends>QOpenGLWidget</extends>
    <header>mainview.h</header>
+   <slots>
+    <signal>updateSteps(int)</signal>
+    <signal>signal1()</signal>
+    <slot>setSteps(int)</slot>
+    <slot>setCombs(int)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -213,5 +222,38 @@ QGroupBox::title {
   <tabstop>subdivSteps</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>subdivSteps</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mainView</receiver>
+   <slot>setSteps(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>429</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>795</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>curveatureCombs</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>mainView</receiver>
+   <slot>setCombs(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>795</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

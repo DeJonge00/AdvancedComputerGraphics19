@@ -11,6 +11,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     updateUniformsRequired = true;
     selectedPt = -1;
     combs = false;
+    steps = 1;
 }
 
 MainView::~MainView() {
@@ -70,7 +71,6 @@ void MainView::createBuffers() {
 }
 
 void MainView::updateBuffers() {
-    int steps = 4;
     QVector<QVector2D> interpolatedCoords = netCoords;
     for (int i = 0; i < steps; i++) {
         interpolatedCoords = generateCurvePoints(interpolatedCoords);
@@ -347,8 +347,23 @@ void MainView::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
-void MainView::setCombs(bool enabled) {
-    combs = enabled;
+void MainView::setCombs(int c) {
+    qDebug() << "combs" << c;
+
+    if (c == 1) {
+        combs = true;
+    } else {
+        combs = false;
+    }
+    updateUniformsRequired = true;
+    updateBuffers();
+    update();
+}
+
+void MainView::setSteps(int s) {
+    steps = s;
+    updateBuffers();
+    update();
 }
 
 void MainView::keyPressEvent(QKeyEvent *event) {
