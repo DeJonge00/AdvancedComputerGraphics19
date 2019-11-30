@@ -9,5 +9,4 @@
 QVector3D vertexPoint(HalfEdge* firstEdge);
 QVector3D edgePoint(HalfEdge* firstEdge);
 
-
 #endif // MESHTOOLS_H

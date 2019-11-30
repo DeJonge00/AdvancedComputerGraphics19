@@ -20,6 +20,9 @@ public:
 
     bool modelLoaded;
     bool wireframeMode;
+    bool reflectionLinesEnabled;
+    float reflectionLinesSize;
+    bool gaussianEnabled;
 
     float FoV;
     float dispRatio;

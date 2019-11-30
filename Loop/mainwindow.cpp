@@ -48,3 +48,31 @@ void MainWindow::on_LoadOBJ_clicked() {
     ui->LoadOBJ->setEnabled(true);
     ui->SubdivSteps->setEnabled(true);
 }
+
+void MainWindow::on_wireframeCheckBox_stateChanged(int enabled)
+{
+    ui->MainDisplay->wireframeMode = enabled == 2;
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_reflectionLinesCheckBox_stateChanged(int enabled)
+{
+    ui->MainDisplay->reflectionLinesEnabled = enabled == 2;
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_reflectionLineNumber_valueChanged(int number)
+{
+    ui->MainDisplay->reflectionLinesSize = 1/float(number);
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_gaussianCheckBox_stateChanged(int enabled)
+{
+    ui->MainDisplay->gaussianEnabled = enabled == 2;
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}

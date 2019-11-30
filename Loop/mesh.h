@@ -30,6 +30,8 @@ public:
     void setFaceNormal(Face& currentFace);
     QVector3D computeVertexNormal(Vertex& currentVertex);
 
+    int countFacelessHalfedges(QVector<HalfEdge> hes);
+
     // For debugging
     void dispVertInfo(Vertex& dVert);
     void dispHalfEdgeInfo(HalfEdge& dHalfEdge);

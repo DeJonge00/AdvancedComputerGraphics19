@@ -1,5 +1,16 @@
 #include "meshtools.h"
 
+int Mesh::countFacelessHalfedges(QVector<HalfEdge> hes) {
+    int cnt = 0;
+    for (HalfEdge he : hes) {
+        if (he.polygon == nullptr) {
+            cnt++;
+        }
+    }
+    qDebug() << "Halfedges without face: " << cnt;
+    return cnt;
+}
+
 void Mesh::subdivideLoop(Mesh& mesh) {
     QVector<Vertex>& newVertices = mesh.getVertices();
     QVector<HalfEdge>& newHalfEdges = mesh.getHalfEdges();
@@ -20,7 +31,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     newHalfEdges.reserve(2*numHalfEdges + 6*numFaces);
     newFaces.reserve(4*numFaces);
 
-    // Create vertex points
+    // Duplicate existing vertex points
     for (unsigned int k = 0; k < numVerts; k++) {
         // Coords (x,y,z), Out, Valence, Index
         newVertices.push_back( Vertex( vertexPoint(vertices[k].out),
@@ -32,7 +43,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     vIndex = numVerts;
     qDebug() << " * Created vertex points";
 
-    // Create edge points
+    // Create new vertices using an edge and the mask
     for (unsigned int k = 0; k < numHalfEdges; k++) {
         currentEdge = &halfEdges[k];
 
@@ -57,7 +68,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     hIndex = 2*numHalfEdges;
     fIndex = 0;
 
-    // Create faces and remaining halfedges
+    // Create new faces and halfedges on the place of each old face
     for (unsigned int k = 0; k < numFaces; k++) {
         currentEdge = faces[k].side;
 
@@ -111,6 +122,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 
         // Inner face
         // Side, Val, Index
+
         newFaces.append(Face(&newHalfEdges[ hIndex-1 ], 3, fIndex));
 
         for (unsigned int m = 0; m < 3; m++) {
@@ -137,6 +149,8 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 
     qDebug() << " * Created faces";
 
+    int faceless_halfedges = countFacelessHalfedges(halfEdges);
+    faceless_halfedges = countFacelessHalfedges(newHalfEdges);
 
 
     // set outs for updated vertices
@@ -187,17 +201,19 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
     HalfEdge* currentEdge;
 
     EdgePt = QVector3D();
-    currentEdge = firstEdge;
+    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
+    else { currentEdge = firstEdge; }
 
-
-    EdgePt = QVector3D();
-    currentEdge = firstEdge;
-    EdgePt  = 6.0 * currentEdge->target->coords;
-    EdgePt += 2.0 * currentEdge->next->target->coords;
-    EdgePt += 6.0 * currentEdge->twin->target->coords;
-    EdgePt += 2.0 * currentEdge->twin->next->target->coords;
-    EdgePt /= 16.0;
-
+    if (currentEdge->polygon == nullptr) {
+        EdgePt = 0.5 * currentEdge->target->coords;
+        EdgePt = 0.5 * currentEdge->twin->target->coords;
+    } else {
+        EdgePt  = 6.0 * currentEdge->target->coords;
+        EdgePt += 2.0 * currentEdge->next->target->coords;
+        EdgePt += 6.0 * currentEdge->twin->target->coords;
+        EdgePt += 2.0 * currentEdge->twin->next->target->coords;
+        EdgePt /= 16.0;
+    }
     return EdgePt;
 
 }

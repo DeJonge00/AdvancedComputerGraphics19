@@ -25,8 +25,13 @@ public:
 private slots:
     void on_RotateDial_valueChanged(int value);
     void on_SubdivSteps_valueChanged(int value);
-
     void on_LoadOBJ_clicked();
+    void on_wireframeCheckBox_stateChanged(int enabled);
+    void on_reflectionLinesCheckBox_stateChanged(int enabled);
+
+    void on_reflectionLineNumber_valueChanged(int number);
+
+    void on_gaussianCheckBox_stateChanged(int enabled);
 
 private:
     Ui::MainWindow *ui;
