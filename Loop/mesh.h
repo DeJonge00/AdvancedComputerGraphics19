@@ -31,6 +31,7 @@ public:
     QVector3D computeVertexNormal(Vertex& currentVertex);
 
     int countFacelessHalfedges(QVector<HalfEdge> hes);
+    void fillBoundaryHalfedges(QVector<HalfEdge>& oldHalfEdges, QVector<HalfEdge>& newHalfEdges);
 
     // For debugging
     void dispVertInfo(Vertex& dVert);

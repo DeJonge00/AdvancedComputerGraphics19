@@ -149,14 +149,16 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 
     qDebug() << " * Created faces";
 
-    int faceless_halfedges = countFacelessHalfedges(halfEdges);
-    faceless_halfedges = countFacelessHalfedges(newHalfEdges);
+    // Find boundary halfedges and fill their Prev and Next pointers
+    fillBoundaryHalfedges(halfEdges, newHalfEdges);
 
+    qDebug() << " * Filled prev/next for boundary halfedges";
 
     // set outs for updated vertices
     for (unsigned int k = 0; k < numVerts; k++) {
         newVertices[k].out = &newHalfEdges[ 2 * vertices[k].out->index ];
     }
+
 }
 
 // ---
@@ -201,21 +203,37 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
     HalfEdge* currentEdge;
 
     EdgePt = QVector3D();
-    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
-    else { currentEdge = firstEdge; }
+//    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
+//    else {
+        currentEdge = firstEdge;
+//    }
 
-    if (currentEdge->polygon == nullptr) {
-        EdgePt = 0.5 * currentEdge->target->coords;
-        EdgePt = 0.5 * currentEdge->twin->target->coords;
-    } else {
+//    if (currentEdge->polygon == nullptr) {
+//        EdgePt = 0.5 * currentEdge->target->coords;
+//        EdgePt = 0.5 * currentEdge->twin->target->coords;
+//    } else {
         EdgePt  = 6.0 * currentEdge->target->coords;
         EdgePt += 2.0 * currentEdge->next->target->coords;
         EdgePt += 6.0 * currentEdge->twin->target->coords;
         EdgePt += 2.0 * currentEdge->twin->next->target->coords;
         EdgePt /= 16.0;
-    }
+//    }
     return EdgePt;
 
+}
+
+void Mesh::fillBoundaryHalfedges(QVector<HalfEdge>& oldHalfEdges, QVector<HalfEdge>& newHalfEdges) {
+    for (int i=0; i < newHalfEdges.size(); i++) {
+        if (newHalfEdges[i].polygon == nullptr) {
+            if (i%2 == 0) { // Old index was i/2
+                newHalfEdges[i].prev = &newHalfEdges[(oldHalfEdges[i/2].prev->index)*2+1];
+                newHalfEdges[i].next = &newHalfEdges[i+1];
+            } else {        // Old index was (i-1)/2
+                newHalfEdges[i].prev = &newHalfEdges[i-1];
+                newHalfEdges[i].next = &newHalfEdges[(oldHalfEdges[(i-1)/2].next->index)*2];
+            }
+        }
+    }
 }
 
 void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges) {

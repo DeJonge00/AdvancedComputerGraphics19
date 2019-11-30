@@ -229,6 +229,14 @@ void MainView::keyPressEvent(QKeyEvent* event) {
         wireframeMode = !wireframeMode;
         update();
         break;
+    case 'X':
+        reflectionLinesEnabled = !reflectionLinesEnabled;
+        update();
+        break;
+    case 'C':
+        gaussianEnabled = !gaussianEnabled;
+        update();
+        break;
     }
 }
 
