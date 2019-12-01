@@ -15,12 +15,14 @@ void main() {
     normal = normalize(vertnormal_camera_fs);
 
   if (reflectionLinesEnabled) {
+      // Choose color based on the normal of the surface compared to the z-axis
       if (mod(dot(normal, vec3(0, 0, 1)), reflectionLinesSize) > (reflectionLinesSize/2)) {
         fColor = vec4(1, 1, 1, 1.0);
       } else {
         fColor = vec4(0,0,0, 1.0);
       }
   } else if (gaussianEnabled) {
+      // Choose color based on the normal of the surface compared to the different axis
       fColor = vec4(dot(normal, vec3(0, 0, 1)), dot(normal, vec3(0, 1, 0)), dot(normal, vec3(1, 0, 0)), 1);
   } else {
       vec3 lightpos = vec3(3.0, 0.0, 2.0)*10.0;

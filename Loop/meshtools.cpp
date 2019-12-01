@@ -245,9 +245,9 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
         EdgePt /= 16.0;
     }
     return EdgePt;
-
 }
 
+// Sets the unset pointers for newly made boundary halfedges
 void Mesh::fillBoundaryHalfedges(QVector<HalfEdge>& oldHalfEdges, QVector<HalfEdge>& newHalfEdges) {
     for (int i=0; i < newHalfEdges.size(); i++) {
         if (newHalfEdges[i].polygon == nullptr) {
