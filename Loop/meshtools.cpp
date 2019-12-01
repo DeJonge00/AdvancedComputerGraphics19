@@ -11,11 +11,23 @@ int Mesh::countFacelessHalfedges(QVector<HalfEdge> hes) {
     return cnt;
 }
 
+// Mark vertices on the boundary as such and make sure the 'out' attribute points towards the halfedge on the boundary
+// so we don't have to search for the boundary halfedge later
+void Mesh::setVertexIsEdge(QVector<HalfEdge>& halfedges) {
+    for (int i = 0; i < halfedges.size(); i++) {
+        if (halfedges[i].polygon == nullptr) {
+            halfedges[i].target->isEdgePoint = true;
+            halfedges[i].target->out = halfedges[i].next;
+        }
+    }
+}
+
 void Mesh::subdivideLoop(Mesh& mesh) {
     QVector<Vertex>& newVertices = mesh.getVertices();
     QVector<HalfEdge>& newHalfEdges = mesh.getHalfEdges();
     QVector<Face>& newFaces = mesh.getFaces();
 
+    setVertexIsEdge(halfEdges);
     unsigned int numVerts, numHalfEdges, numFaces;
     unsigned int vIndex, hIndex, fIndex;
     HalfEdge* currentEdge;
@@ -164,15 +176,29 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 // ---
 
 QVector3D vertexPoint(HalfEdge* firstEdge) {
-    unsigned short k, n;
-    QVector3D sumStarPts, sumFacePts;
+    unsigned short n;
     QVector3D vertexPt;
-    float stencilValue;
-    HalfEdge* currentEdge;
     Vertex* currentVertex;
 
     currentVertex = firstEdge->twin->target;
     n = currentVertex->val;
+
+    // Vertex sits on the boundary
+    if (currentVertex->isEdgePoint) {
+        vertexPt = QVector3D();
+        // Mask 1/8, 3/4, 1/8 for the next vertex, current vertex, previous vertex respectively
+        vertexPt += currentVertex->out->target->coords;
+        vertexPt += 6* currentVertex->coords;
+        vertexPt += currentVertex->out->prev->prev->target->coords;
+        vertexPt /= 8;
+        return vertexPt;
+    }
+    \
+    // Allocate more for non-boundary vertices
+    unsigned short k;
+    QVector3D sumStarPts, sumFacePts;
+    float stencilValue;
+    HalfEdge* currentEdge;
 
     sumStarPts = QVector3D();
     sumFacePts = QVector3D();
@@ -203,21 +229,21 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
     HalfEdge* currentEdge;
 
     EdgePt = QVector3D();
-//    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
-//    else {
+    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
+    else {
         currentEdge = firstEdge;
-//    }
+    }
 
-//    if (currentEdge->polygon == nullptr) {
-//        EdgePt = 0.5 * currentEdge->target->coords;
-//        EdgePt = 0.5 * currentEdge->twin->target->coords;
-//    } else {
+    if (currentEdge->polygon == nullptr) {
+        EdgePt = 0.5 * currentEdge->target->coords;
+        EdgePt += 0.5 * currentEdge->twin->target->coords;
+    } else {
         EdgePt  = 6.0 * currentEdge->target->coords;
         EdgePt += 2.0 * currentEdge->next->target->coords;
         EdgePt += 6.0 * currentEdge->twin->target->coords;
         EdgePt += 2.0 * currentEdge->twin->next->target->coords;
         EdgePt /= 16.0;
-//    }
+    }
     return EdgePt;
 
 }

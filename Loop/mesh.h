@@ -32,6 +32,7 @@ public:
 
     int countFacelessHalfedges(QVector<HalfEdge> hes);
     void fillBoundaryHalfedges(QVector<HalfEdge>& oldHalfEdges, QVector<HalfEdge>& newHalfEdges);
+    void setVertexIsEdge(QVector<HalfEdge>& halfedges);
 
     // For debugging
     void dispVertInfo(Vertex& dVert);
