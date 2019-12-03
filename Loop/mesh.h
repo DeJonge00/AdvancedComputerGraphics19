@@ -36,7 +36,7 @@ public:
     void dispFaceInfo(Face& dFace);
 
     void subdivideLoop(Mesh& mesh);
-    void splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges);
+    void splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges, QVector<HalfEdge*>& boundaryEdges);
 
 private:
     QVector<QVector3D> vertexCoords;

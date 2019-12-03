@@ -47,10 +47,18 @@ void Mesh::subdivideLoop(Mesh& mesh) {
         }
     }
 
+    QVector<HalfEdge*> boundaryEdges = QVector<HalfEdge*>();
+    for (unsigned int ind = 0; ind < numHalfEdges; ind++) {
+        if (halfEdges[ind].polygon == nullptr) {
+            boundaryEdges.append(&halfEdges[ind]);
+        }
+    }
+    qDebug() << boundaryEdges.size() << "halfedges with no face found";
+
     qDebug() << " * Created edge points";
 
     // Split halfedges
-    splitHalfEdges(newVertices, newHalfEdges);
+    splitHalfEdges(newVertices, newHalfEdges, boundaryEdges);
 
     qDebug() << " * Split halfedges";
 
@@ -202,42 +210,45 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
 
 }
 
-void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges) {
+void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges, QVector<HalfEdge*>& boundaryEdges) {
     unsigned int vIndex = vertices.size();
 
     for (unsigned int k = 0; k < halfEdges.size(); ++k) {
         HalfEdge* currentEdge = &halfEdges[k];
-        unsigned int m = currentEdge->twin->index;
 
-        // Target, Next, Prev, Twin, Poly, Index
-        newHalfEdges.append(HalfEdge(nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              2*k));
+        if (!boundaryEdges.contains(currentEdge)) {
+            unsigned int m = currentEdge->twin->index;
 
-        newHalfEdges.append(HalfEdge(nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              nullptr,
-                                              2*k+1));
+            // Target, Next, Prev, Twin, Poly, Index
+            newHalfEdges.append(HalfEdge(nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  2*k));
 
-        if (k < m) {
-            newHalfEdges[2*k].target = &newVertices[ vIndex ];
-            newHalfEdges[2*k+1].target = &newVertices[ currentEdge->target->index ];
-            vIndex++;
-        }
-        else {
-            newHalfEdges[2*k].target = newHalfEdges[2*m].target;
-            newHalfEdges[2*k+1].target = &newVertices[ currentEdge->target->index ];
+            newHalfEdges.append(HalfEdge(nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  nullptr,
+                                                  2*k+1));
 
-            // Assign Twinss
-            newHalfEdges[2*k].twin = &newHalfEdges[2*m+1];
-            newHalfEdges[2*k+1].twin = &newHalfEdges[2*m];
-            newHalfEdges[2*m].twin = &newHalfEdges[2*k+1];
-            newHalfEdges[2*m+1].twin = &newHalfEdges[2*k];
+            if (k < m) {
+                newHalfEdges[2*k].target = &newVertices[ vIndex ];
+                newHalfEdges[2*k+1].target = &newVertices[ currentEdge->target->index ];
+                vIndex++;
+            }
+            else {
+                newHalfEdges[2*k].target = newHalfEdges[2*m].target;
+                newHalfEdges[2*k+1].target = &newVertices[ currentEdge->target->index ];
+
+                // Assign Twinss
+                newHalfEdges[2*k].twin = &newHalfEdges[2*m+1];
+                newHalfEdges[2*k+1].twin = &newHalfEdges[2*m];
+                newHalfEdges[2*m].twin = &newHalfEdges[2*k+1];
+                newHalfEdges[2*m+1].twin = &newHalfEdges[2*k];
+            }
         }
     }
 
