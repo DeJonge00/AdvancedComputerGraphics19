@@ -46,3 +46,16 @@ void MainWindow::on_SubdivSteps_valueChanged(int value) {
 
     ui->MainDisplay->updateMeshBuffers( Meshes[value] );
 }
+
+void MainWindow::on_wireframeCheckbox_stateChanged(int state)
+{
+    ui->MainDisplay->wireframeMode = state == 2;
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_limitPositionCheckbox_stateChanged(int state)
+{
+    ui->MainDisplay->positionModeLimit = state == 2;
+    ui->MainDisplay->updateMeshBuffers( Meshes[ui->SubdivSteps->value()] );
+    ui->MainDisplay->update();
+}

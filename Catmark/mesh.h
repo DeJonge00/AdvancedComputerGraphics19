@@ -26,6 +26,8 @@ public:
     inline QVector<QVector3D>& getVertexNorms() { return vertexNormals; }
     inline QVector<unsigned int>& getPolyIndices() { return polyIndices; }
 
+    QVector<QVector3D> getLimitPositions();
+
     void setTwins(unsigned int numHalfEdges, unsigned int indexH, QVector<QVector<unsigned int>>& potentialTwins);
 
     QVector3D facePoint(HalfEdge* firstEdge);
@@ -49,6 +51,7 @@ public:
 
     void subdivideCatmullClark(Mesh& mesh);
     void splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges);
+    QVector3D calcFacePoint(HalfEdge* he);
 private:
     QVector<Vertex> vertices;
     QVector<Face> faces;

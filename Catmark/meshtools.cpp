@@ -15,6 +15,66 @@ HalfEdge* vertOnBoundary(Vertex* currentVertex) {
     return nullptr;
 }
 
+bool isRegularMeshVertex(Vertex v) {
+    HalfEdge *start = v.out, *current = v.out;
+    do {
+        if (current->polygon->val != 4) { return false; }
+        current = current->twin->next;
+    } while (current != start);
+    return true;
+}
+
+QVector3D Mesh::calcFacePoint(HalfEdge* current) {
+    HalfEdge* h = current;
+    QVector3D f = QVector3D();
+    do {
+        f += current->target->coords;
+        h = h->next;
+    } while (h != current);
+    f /= current->polygon->val;
+    return f;
+}
+
+QVector<QVector3D> Mesh::getLimitPositions() {
+    qDebug() << "getLimitPositions start";
+    QVector<QVector3D> vertexCoords = QVector<QVector3D>();
+    for (int i = 0; i < vertices.size(); i++) {
+        Vertex* currentVertex = &vertices[i];
+        if (vertOnBoundary(currentVertex)) {
+            vertexCoords.append(currentVertex->coords);
+        } else if (isRegularMeshVertex(*currentVertex)) {
+            vertexCoords.append(currentVertex->val*currentVertex->val * currentVertex->coords);
+            HalfEdge *start = currentVertex->out, *current = currentVertex->out;
+            do {
+                // Add edgepoint e and (normalized) facepoint f with weights
+                vertexCoords[i] += 4 * current->target->coords;
+                vertexCoords[i] += calcFacePoint(current);
+
+                // Loop index
+                current = current->twin->next;
+            } while (current != start);
+            // Normalize
+            vertexCoords[i] /= currentVertex->val * (currentVertex->val + 5);
+        } else { // Irregular, non-boundary meshpoint == N-gon
+            float n = currentVertex->val;
+            QVector3D s = QVector3D();
+            HalfEdge* current = currentVertex->out;
+            do {
+                s += ((current->target->coords + currentVertex->coords) / 2);
+                s += calcFacePoint(current);
+                // Loop index
+                current = current->twin->next;
+            } while (current != currentVertex->out);
+
+            vertexCoords.append((n-3)/(n+5) * currentVertex->coords + (4 / (n*(n+5)) * s));
+            qDebug() << i << currentVertex->coords << "n" << n << "s" << s << "result" << vertexCoords[i];
+            qDebug() << (n-3)/(n+5) << currentVertex->coords << (4 / (n*(n+5)) * s);
+        }
+    }
+    qDebug() << "Retrieved Limit Positions";
+    return vertexCoords;
+}
+
 
 void Mesh::subdivideCatmullClark(Mesh& mesh) {
     QVector<Vertex>& newVertices = mesh.getVertices();

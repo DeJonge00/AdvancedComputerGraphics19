@@ -12,6 +12,9 @@
 
 #define MAX_INT ((unsigned int) -1)
 
+#define POSITION_MODE_GIVEN 0
+#define POSITION_MODE_LIMIT 1
+
 class MainView : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core {
 
     Q_OBJECT
@@ -32,6 +35,8 @@ public:
     void updateMatrices();
     void updateUniforms();
     void updateMeshBuffers(Mesh& currentMesh);
+
+    bool positionModeLimit;
 
 protected:
     void initializeGL();

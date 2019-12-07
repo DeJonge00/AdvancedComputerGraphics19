@@ -75,10 +75,10 @@ QGroupBox::title {
       <widget class="QDial" name="RotationDial">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>130</y>
-         <width>50</width>
-         <height>64</height>
+         <x>70</x>
+         <y>140</y>
+         <width>71</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="maximum">
@@ -129,6 +129,54 @@ QGroupBox::title {
        <property name="text">
         <string>Catmull-Clark steps</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>19</x>
+         <y>319</y>
+         <width>181</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="positionModeLabel">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Mode</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="wireframeCheckbox">
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="limitPositionCheckbox">
+          <property name="text">
+           <string>Limit position</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

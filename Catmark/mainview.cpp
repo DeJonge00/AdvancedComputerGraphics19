@@ -6,6 +6,7 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     modelLoaded = false;
     wireframeMode = true;
     uniformUpdateRequired = true;
+    positionModeLimit = false;
 
     rotAngle = 0.0;
     FoV = 60.0;
@@ -72,6 +73,9 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
     //gather attributes for current mesh
     currentMesh.extractAttributes();
     QVector<QVector3D>& vertexCoords = currentMesh.getVertexCoords();
+    if (positionModeLimit) {
+        vertexCoords = currentMesh.getLimitPositions();
+    }
     QVector<QVector3D>& vertexNormals = currentMesh.getVertexNorms();
     QVector<unsigned int>& polyIndices = currentMesh.getPolyIndices();
 

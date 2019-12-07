@@ -25,6 +25,8 @@ private slots:
     void on_ImportOBJ_clicked();
     void on_RotationDial_valueChanged(int value);
     void on_SubdivSteps_valueChanged(int value);
+    void on_wireframeCheckbox_stateChanged(int state);
+    void on_limitPositionCheckbox_stateChanged(int state);
 
 private:
     Ui::MainWindow *ui;
