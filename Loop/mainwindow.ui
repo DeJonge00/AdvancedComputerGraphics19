@@ -157,6 +157,99 @@ QGroupBox::title {
         <bool>false</bool>
        </property>
       </widget>
+      <widget class="QCheckBox" name="wireframeCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>280</y>
+         <width>181</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wireframe</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="reflectionLinesCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>340</y>
+         <width>181</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Enabled</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="reflectionLineNumber">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>360</y>
+         <width>181</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>2</number>
+       </property>
+       <property name="maximum">
+        <number>20</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="reflectionLinesLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>320</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Loop subdivision steps</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="gaussianLabel">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>410</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Gaussian curvature</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="gaussianCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>430</y>
+         <width>181</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Enabled</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -171,6 +264,9 @@ QGroupBox::title {
    <class>MainView</class>
    <extends>QOpenGLWidget</extends>
    <header>mainview.h</header>
+   <slots>
+    <slot>setWireframe(int)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>

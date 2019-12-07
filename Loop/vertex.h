@@ -14,6 +14,7 @@ public:
     unsigned short val;
     unsigned int index;
     unsigned short sharpness;
+    bool isEdgePoint;
 
     // Inline constructors
     Vertex() {
@@ -23,6 +24,7 @@ public:
         val = 0;
         index = 0;
         sharpness = 0;
+        isEdgePoint = false;
     }
 
     Vertex(QVector3D vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0) {
@@ -32,6 +34,7 @@ public:
         val = vval;
         index = vindex;
         sharpness = vsharpness;
+        isEdgePoint = false;
     }
 };
 

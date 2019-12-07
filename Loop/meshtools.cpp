@@ -1,10 +1,33 @@
 #include "meshtools.h"
 
+int Mesh::countFacelessHalfedges(QVector<HalfEdge> hes) {
+    int cnt = 0;
+    for (HalfEdge he : hes) {
+        if (he.polygon == nullptr) {
+            cnt++;
+        }
+    }
+    qDebug() << "Halfedges without face: " << cnt;
+    return cnt;
+}
+
+// Mark vertices on the boundary as such and make sure the 'out' attribute points towards the halfedge on the boundary
+// so we don't have to search for the boundary halfedge later
+void Mesh::setVertexIsEdge(QVector<HalfEdge>& halfedges) {
+    for (int i = 0; i < halfedges.size(); i++) {
+        if (halfedges[i].polygon == nullptr) {
+            halfedges[i].target->isEdgePoint = true;
+            halfedges[i].target->out = halfedges[i].next;
+        }
+    }
+}
+
 void Mesh::subdivideLoop(Mesh& mesh) {
     QVector<Vertex>& newVertices = mesh.getVertices();
     QVector<HalfEdge>& newHalfEdges = mesh.getHalfEdges();
     QVector<Face>& newFaces = mesh.getFaces();
 
+    setVertexIsEdge(halfEdges);
     unsigned int numVerts, numHalfEdges, numFaces;
     unsigned int vIndex, hIndex, fIndex;
     HalfEdge* currentEdge;
@@ -20,7 +43,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     newHalfEdges.reserve(2*numHalfEdges + 6*numFaces);
     newFaces.reserve(4*numFaces);
 
-    // Create vertex points
+    // Duplicate existing vertex points
     for (unsigned int k = 0; k < numVerts; k++) {
         // Coords (x,y,z), Out, Valence, Index
         newVertices.push_back( Vertex( vertexPoint(vertices[k].out),
@@ -32,7 +55,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     vIndex = numVerts;
     qDebug() << " * Created vertex points";
 
-    // Create edge points
+    // Create new vertices using an edge and the mask
     for (unsigned int k = 0; k < numHalfEdges; k++) {
         currentEdge = &halfEdges[k];
 
@@ -65,7 +88,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
     hIndex = 2*numHalfEdges;
     fIndex = 0;
 
-    // Create faces and remaining halfedges
+    // Create new faces and halfedges on the place of each old face
     for (unsigned int k = 0; k < numFaces; k++) {
         currentEdge = faces[k].side;
 
@@ -119,6 +142,7 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 
         // Inner face
         // Side, Val, Index
+
         newFaces.append(Face(&newHalfEdges[ hIndex-1 ], 3, fIndex));
 
         for (unsigned int m = 0; m < 3; m++) {
@@ -145,26 +169,44 @@ void Mesh::subdivideLoop(Mesh& mesh) {
 
     qDebug() << " * Created faces";
 
+    // Find boundary halfedges and fill their Prev and Next pointers
+    fillBoundaryHalfedges(halfEdges, newHalfEdges);
 
+    qDebug() << " * Filled prev/next for boundary halfedges";
 
     // set outs for updated vertices
     for (unsigned int k = 0; k < numVerts; k++) {
         newVertices[k].out = &newHalfEdges[ 2 * vertices[k].out->index ];
     }
+
 }
 
 // ---
 
 QVector3D vertexPoint(HalfEdge* firstEdge) {
-    unsigned short k, n;
-    QVector3D sumStarPts, sumFacePts;
+    unsigned short n;
     QVector3D vertexPt;
-    float stencilValue;
-    HalfEdge* currentEdge;
     Vertex* currentVertex;
 
     currentVertex = firstEdge->twin->target;
     n = currentVertex->val;
+
+    // Vertex sits on the boundary
+    if (currentVertex->isEdgePoint) {
+        vertexPt = QVector3D();
+        // Mask 1/8, 3/4, 1/8 for the next vertex, current vertex, previous vertex respectively
+        vertexPt += currentVertex->out->target->coords;
+        vertexPt += 6* currentVertex->coords;
+        vertexPt += currentVertex->out->prev->prev->target->coords;
+        vertexPt /= 8;
+        return vertexPt;
+    }
+    \
+    // Allocate more for non-boundary vertices
+    unsigned short k;
+    QVector3D sumStarPts, sumFacePts;
+    float stencilValue;
+    HalfEdge* currentEdge;
 
     sumStarPts = QVector3D();
     sumFacePts = QVector3D();
@@ -195,19 +237,37 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
     HalfEdge* currentEdge;
 
     EdgePt = QVector3D();
-    currentEdge = firstEdge;
+    if (firstEdge->twin->polygon == nullptr) { currentEdge = firstEdge->twin; }
+    else {
+        currentEdge = firstEdge;
+    }
 
-
-    EdgePt = QVector3D();
-    currentEdge = firstEdge;
-    EdgePt  = 6.0 * currentEdge->target->coords;
-    EdgePt += 2.0 * currentEdge->next->target->coords;
-    EdgePt += 6.0 * currentEdge->twin->target->coords;
-    EdgePt += 2.0 * currentEdge->twin->next->target->coords;
-    EdgePt /= 16.0;
-
+    if (currentEdge->polygon == nullptr) {
+        EdgePt = 0.5 * currentEdge->target->coords;
+        EdgePt += 0.5 * currentEdge->twin->target->coords;
+    } else {
+        EdgePt  = 6.0 * currentEdge->target->coords;
+        EdgePt += 2.0 * currentEdge->next->target->coords;
+        EdgePt += 6.0 * currentEdge->twin->target->coords;
+        EdgePt += 2.0 * currentEdge->twin->next->target->coords;
+        EdgePt /= 16.0;
+    }
     return EdgePt;
+}
 
+// Sets the unset pointers for newly made boundary halfedges
+void Mesh::fillBoundaryHalfedges(QVector<HalfEdge>& oldHalfEdges, QVector<HalfEdge>& newHalfEdges) {
+    for (int i=0; i < newHalfEdges.size(); i++) {
+        if (newHalfEdges[i].polygon == nullptr) {
+            if (i%2 == 0) { // Old index was i/2
+                newHalfEdges[i].prev = &newHalfEdges[(oldHalfEdges[i/2].prev->index)*2+1];
+                newHalfEdges[i].next = &newHalfEdges[i+1];
+            } else {        // Old index was (i-1)/2
+                newHalfEdges[i].prev = &newHalfEdges[i-1];
+                newHalfEdges[i].next = &newHalfEdges[(oldHalfEdges[(i-1)/2].next->index)*2];
+            }
+        }
+    }
 }
 
 void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHalfEdges, QVector<HalfEdge*>& boundaryEdges) {

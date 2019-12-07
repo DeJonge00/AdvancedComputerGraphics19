@@ -166,7 +166,7 @@ void Mesh::setTwins(unsigned int numHalfEdges, unsigned int indexH, QVector<QVec
     // Assign Twins
     for (unsigned int m = 0; m < numHalfEdges; m++) {
         he = &halfEdges[m];
-        if (not he->twin) {
+        if (!he->twin) {
             hTail = he->prev->target->index;
             hHead = he->target->index;
             len = he->target->val;

@@ -1,0 +1,14 @@
+Rick de Jonge
+s2775832
+
+Advance Computer Graphics 
+01-12-2019
+
+This homework submission contains a QT project with the executable program. 
+This program has been extended in subdivideLoop function with the fillBoundaryHalfedges 
+function to fill the unset pointers. The edgePoint function now interpolates with a 
+(1/2)(1, 1) mask for boundary points, while the vertexPoint function has been extended 
+to interpolate new boundary vertices with a (1/8)(1,6,1) mask.
+
+The fragment shader has been extended to be able to switch between wireframes, surface
+reflection, reflectionlines and a gaussian color mode, which are toggleable from the ui.

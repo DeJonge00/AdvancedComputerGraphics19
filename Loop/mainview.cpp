@@ -7,6 +7,10 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     wireframeMode = true;
     uniformUpdateRequired = true;
 
+    reflectionLinesEnabled = false;
+    reflectionLinesSize = 0.5f;
+    gaussianEnabled = false;
+
     rotAngle = 0.0;
     dispRatio = 16.0/9.0;
     FoV = 120.0;
@@ -66,6 +70,7 @@ void MainView::createBuffers() {
 }
 
 void MainView::updateMeshBuffers(Mesh& currentMesh) {
+    makeCurrent();
     //gather attributes for current mesh
     currentMesh.extractAttributes();
     QVector<QVector3D>& vertexCoords = currentMesh.getVertexCoords();
@@ -116,6 +121,10 @@ void MainView::updateUniforms() {
     glUniformMatrix4fv(uniModelViewMatrix, 1, false, modelViewMatrix.data());
     glUniformMatrix4fv(uniProjectionMatrix, 1, false, projectionMatrix.data());
     glUniformMatrix3fv(uniNormalMatrix, 1, false, normalMatrix.data());
+
+    mainShaderProg->setUniformValue("reflectionLinesEnabled", reflectionLinesEnabled);
+    mainShaderProg->setUniformValue("reflectionLinesSize", reflectionLinesSize);
+    mainShaderProg->setUniformValue("gaussianEnabled", gaussianEnabled);
 
 }
 
@@ -218,6 +227,14 @@ void MainView::keyPressEvent(QKeyEvent* event) {
     switch(event->key()) {
     case 'Z':
         wireframeMode = !wireframeMode;
+        update();
+        break;
+    case 'X':
+        reflectionLinesEnabled = !reflectionLinesEnabled;
+        update();
+        break;
+    case 'C':
+        gaussianEnabled = !gaussianEnabled;
         update();
         break;
     }
