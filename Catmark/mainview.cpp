@@ -66,6 +66,11 @@ void MainView::createBuffers() {
     glGenBuffers(1, &meshIndexBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshIndexBO);
 
+//    glGenBuffers(1, &patchesBO);
+//    glBindBuffer(GL_ARRAY_BUFFER, patchesBO);
+//    glEnableVertexAttribArray(0);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
     glBindVertexArray(0);
 }
 
@@ -97,7 +102,14 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
 
     qDebug() << " → Updated meshIndexBO";
 
+//    QVector<QVector3D> patches = currentMesh.getPatches();
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, patchesBO);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*patches.size(), patches.data(), GL_DYNAMIC_DRAW);
+
+//    qDebug() << " → Updated patchesBO";
+
     meshIBOSize = polyIndices.size();
+//    patchesIBOSize = patches.size();
 
     update();
 
@@ -160,6 +172,7 @@ void MainView::initializeGL() {
 
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(MAX_INT);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     // ---
 
@@ -198,7 +211,6 @@ void MainView::paintGL() {
         renderMesh();
 
         mainShaderProg->release();
-
     }
 }
 
@@ -211,9 +223,9 @@ void MainView::renderMesh() {
     if (wireframeMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
-    } else if (tessallation > 0) {
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
+//    } else if (tessallation > 0) {
+//        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+//        glDrawElements(GL_PATCHES, patchesIBOSize, GL_UNSIGNED_INT, 0);
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glDrawElements(GL_TRIANGLE_FAN, meshIBOSize, GL_UNSIGNED_INT, 0);

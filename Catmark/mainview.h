@@ -61,10 +61,10 @@ private:
 
     // ---
 
-    QOpenGLShaderProgram* mainShaderProg;
+    QOpenGLShaderProgram* mainShaderProg, *tessShaderProg;
 
-    GLuint meshVAO, meshCoordsBO, meshNormalsBO, meshIndexBO;
-    unsigned int meshIBOSize;
+    GLuint meshVAO, meshCoordsBO, meshNormalsBO, meshIndexBO, patchesBO;
+    unsigned int meshIBOSize, patchesIBOSize;
 
     // ---
 

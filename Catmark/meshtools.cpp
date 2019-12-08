@@ -24,6 +24,7 @@ bool isRegularMeshVertex(Vertex v) {
     return true;
 }
 
+// Return average of all vertices of a face
 QVector3D Mesh::calcFacePoint(HalfEdge* current) {
     HalfEdge* h = current;
     QVector3D f = QVector3D();
@@ -35,11 +36,46 @@ QVector3D Mesh::calcFacePoint(HalfEdge* current) {
     return f;
 }
 
+// Check whether all vertices of a face have valency 4
+bool isRegularMeshFace(Face f) {
+    if (f.val != 4) {
+        return false;
+    }
+    HalfEdge *start = f.side, *current = f.side;
+    do {
+        if (current->target->val != 4) {
+            return false;
+        }
+        current = current->next;
+    } while (current != start);
+    return true;
+}
+
+// Construct array of patches consisting of vertice coordinates
+QVector<QVector3D> Mesh::getPatches() {
+    QVector<QVector3D> patches = QVector<QVector3D>();
+
+    for (int i = 0; i < faces.size(); i++) {
+        if (isRegularMeshFace(faces[i])) {
+            HalfEdge* h = faces[i].side;
+            for (int i = 0; i < 4; i++) {
+                patches.append(h->target->coords);
+                h = h->next;
+            }
+        }
+    }
+
+    return patches;
+}
+
 QVector<QVector3D> Mesh::getLimitPositions() {
 //    qDebug() << "getLimitPositions start";
     QVector<QVector3D> vertexCoords = QVector<QVector3D>();
+    // Calculate new position for each vertex
     for (int i = 0; i < vertices.size(); i++) {
         Vertex* currentVertex = &vertices[i];
+
+        // Branch boundaries, regular meshpoints and other
         if (vertOnBoundary(currentVertex)) {
             vertexCoords.append(currentVertex->coords);
         } else if (isRegularMeshVertex(*currentVertex)) {
