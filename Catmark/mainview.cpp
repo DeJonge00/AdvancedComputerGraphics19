@@ -7,7 +7,7 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     wireframeMode = true;
     uniformUpdateRequired = true;
     positionModeLimit = false;
-    tessallation = 0;
+    tessellation = 0;
 
     rotAngle = 0.0;
     FoV = 60.0;
@@ -35,15 +35,30 @@ void MainView::createShaderPrograms() {
 
     mainShaderProg = new QOpenGLShaderProgram();
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
-    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationControl, ":/shaders/tcs.glsl");
-    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation, ":/shaders/tes.glsl");
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
 
     mainShaderProg->link();
 
-    uniModelViewMatrix = glGetUniformLocation(mainShaderProg->programId(), "modelviewmatrix");
-    uniProjectionMatrix = glGetUniformLocation(mainShaderProg->programId(), "projectionmatrix");
-    uniNormalMatrix = glGetUniformLocation(mainShaderProg->programId(), "normalmatrix");
+    tessShaderProg = new QOpenGLShaderProgram();
+    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationControl, ":/shaders/tcs.glsl");
+    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation, ":/shaders/tes.glsl");
+    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
+
+    tessShaderProg->link();
+    setMatrices();
+}
+
+void MainView::setMatrices() {
+    if (tessellation > 0) {
+        uniModelViewMatrix = glGetUniformLocation(tessShaderProg->programId(), "modelviewmatrix");
+        uniProjectionMatrix = glGetUniformLocation(tessShaderProg->programId(), "projectionmatrix");
+        uniNormalMatrix = glGetUniformLocation(tessShaderProg->programId(), "normalmatrix");
+    } else {
+        uniModelViewMatrix = glGetUniformLocation(mainShaderProg->programId(), "modelviewmatrix");
+        uniProjectionMatrix = glGetUniformLocation(mainShaderProg->programId(), "projectionmatrix");
+        uniNormalMatrix = glGetUniformLocation(mainShaderProg->programId(), "normalmatrix");
+    }
 }
 
 void MainView::createBuffers() {
@@ -66,11 +81,6 @@ void MainView::createBuffers() {
     glGenBuffers(1, &meshIndexBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshIndexBO);
 
-//    glGenBuffers(1, &patchesBO);
-//    glBindBuffer(GL_ARRAY_BUFFER, patchesBO);
-//    glEnableVertexAttribArray(0);
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
     glBindVertexArray(0);
 }
 
@@ -86,6 +96,9 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
     }
     QVector<QVector3D>& vertexNormals = currentMesh.getVertexNorms();
     QVector<unsigned int>& polyIndices = currentMesh.getPolyIndices();
+    if (tessellation > 0) {
+        polyIndices = currentMesh.getPatches();
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, meshCoordsBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(QVector3D)*vertexCoords.size(), vertexCoords.data(), GL_DYNAMIC_DRAW);
@@ -102,14 +115,7 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
 
     qDebug() << " → Updated meshIndexBO";
 
-//    QVector<QVector3D> patches = currentMesh.getPatches();
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, patchesBO);
-//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*patches.size(), patches.data(), GL_DYNAMIC_DRAW);
-
-//    qDebug() << " → Updated patchesBO";
-
     meshIBOSize = polyIndices.size();
-//    patchesIBOSize = patches.size();
 
     update();
 
@@ -132,15 +138,14 @@ void MainView::updateMatrices() {
 
 }
 
-void MainView::updateUniforms() {
+void MainView::updateUniforms(QOpenGLShaderProgram* shaderProg) {
 
     // mainShaderProg should be bound at this point!
 
     glUniformMatrix4fv(uniModelViewMatrix, 1, false, modelViewMatrix.data());
     glUniformMatrix4fv(uniProjectionMatrix, 1, false, projectionMatrix.data());
     glUniformMatrix3fv(uniNormalMatrix, 1, false, normalMatrix.data());
-    mainShaderProg->setUniformValue("tessallation", tessallation);
-
+    shaderProg->setUniformValue("tessellation", tessellation);
 }
 
 // ---
@@ -201,16 +206,20 @@ void MainView::paintGL() {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mainShaderProg->bind();
+        QOpenGLShaderProgram* shaderProg = mainShaderProg;
+        if (tessellation > 0) {
+            shaderProg = tessShaderProg;
+        }
+        shaderProg->bind();
 
         if (uniformUpdateRequired) {
-            updateUniforms();
+            updateUniforms(shaderProg);
             uniformUpdateRequired = false;
         }
 
         renderMesh();
 
-        mainShaderProg->release();
+        shaderProg->release();
     }
 }
 
@@ -223,9 +232,9 @@ void MainView::renderMesh() {
     if (wireframeMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
-//    } else if (tessallation > 0) {
-//        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-//        glDrawElements(GL_PATCHES, patchesIBOSize, GL_UNSIGNED_INT, 0);
+    } else if (tessellation > 0) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glDrawElements(GL_TRIANGLE_FAN, meshIBOSize, GL_UNSIGNED_INT, 0);

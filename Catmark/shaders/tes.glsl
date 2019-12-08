@@ -1,6 +1,6 @@
 #version 410
 
-uniform int tessallation;
+uniform int tessellation;
 
 layout (quads) in;
 

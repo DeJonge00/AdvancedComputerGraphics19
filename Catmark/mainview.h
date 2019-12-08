@@ -33,11 +33,12 @@ public:
     bool uniformUpdateRequired;
 
     void updateMatrices();
-    void updateUniforms();
+    void updateUniforms(QOpenGLShaderProgram* shaderProg);
     void updateMeshBuffers(Mesh& currentMesh);
+    void setMatrices();
 
     bool positionModeLimit;
-    int tessallation;
+    int tessellation;
 
 protected:
     void initializeGL();

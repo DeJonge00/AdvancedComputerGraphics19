@@ -52,19 +52,19 @@ bool isRegularMeshFace(Face f) {
 }
 
 // Construct array of patches consisting of vertice coordinates
-QVector<QVector3D> Mesh::getPatches() {
-    QVector<QVector3D> patches = QVector<QVector3D>();
+QVector<unsigned int> Mesh::getPatches() {
+    QVector<unsigned int> patches = QVector<unsigned int>();
 
     for (int i = 0; i < faces.size(); i++) {
         if (isRegularMeshFace(faces[i])) {
             HalfEdge* h = faces[i].side;
-            for (int i = 0; i < 4; i++) {
-                patches.append(h->target->coords);
+            for (int i = 0; i < faces[i].val; i++) {
+                patches.append(h->target->index);
                 h = h->next;
             }
         }
+        polyIndices.append(MAX_INT);
     }
-
     return patches;
 }
 
@@ -103,14 +103,11 @@ QVector<QVector3D> Mesh::getLimitPositions() {
             } while (current != currentVertex->out);
 
             vertexCoords.append((n-3)/(n+5) * currentVertex->coords + (4 / (n*(n+5)) * s));
-            qDebug() << i << currentVertex->coords << "n" << n << "s" << s << "result" << vertexCoords[i];
-            qDebug() << (n-3)/(n+5) << currentVertex->coords << (4 / (n*(n+5)) * s);
         }
     }
     qDebug() << "Retrieved Limit Positions";
     return vertexCoords;
 }
-
 
 void Mesh::subdivideCatmullClark(Mesh& mesh) {
     QVector<Vertex>& newVertices = mesh.getVertices();
