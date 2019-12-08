@@ -59,3 +59,10 @@ void MainWindow::on_limitPositionCheckbox_stateChanged(int state)
     ui->MainDisplay->updateMeshBuffers( Meshes[ui->SubdivSteps->value()] );
     ui->MainDisplay->update();
 }
+
+void MainWindow::on_tessallationLevel_valueChanged(int value)
+{
+    ui->MainDisplay->tessallation = value;
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}

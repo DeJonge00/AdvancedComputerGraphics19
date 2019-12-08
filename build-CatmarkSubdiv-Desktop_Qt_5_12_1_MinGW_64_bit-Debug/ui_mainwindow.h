@@ -33,14 +33,16 @@ public:
     QGroupBox *SettingsGB;
     QLabel *RotationLabel;
     QDial *RotationDial;
-    QSpinBox *SubdivSteps;
     QPushButton *ImportOBJ;
-    QLabel *StepsLabel;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
+    QLabel *StepsLabel;
+    QSpinBox *SubdivSteps;
     QLabel *positionModeLabel;
     QCheckBox *wireframeCheckbox;
     QCheckBox *limitPositionCheckbox;
+    QLabel *tessallationLabel;
+    QSpinBox *tessallationLevel;
     MainView *MainDisplay;
 
     void setupUi(QMainWindow *MainWindow)
@@ -86,23 +88,27 @@ public:
         RotationDial->setWrapping(true);
         RotationDial->setNotchTarget(12.000000000000000);
         RotationDial->setNotchesVisible(true);
-        SubdivSteps = new QSpinBox(SettingsGB);
-        SubdivSteps->setObjectName(QString::fromUtf8("SubdivSteps"));
-        SubdivSteps->setGeometry(QRect(20, 260, 181, 29));
         ImportOBJ = new QPushButton(SettingsGB);
         ImportOBJ->setObjectName(QString::fromUtf8("ImportOBJ"));
         ImportOBJ->setGeometry(QRect(20, 40, 181, 28));
-        StepsLabel = new QLabel(SettingsGB);
-        StepsLabel->setObjectName(QString::fromUtf8("StepsLabel"));
-        StepsLabel->setGeometry(QRect(20, 230, 181, 20));
         verticalLayoutWidget = new QWidget(SettingsGB);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(19, 319, 181, 101));
+        verticalLayoutWidget->setGeometry(QRect(19, 235, 181, 171));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
+        StepsLabel = new QLabel(verticalLayoutWidget);
+        StepsLabel->setObjectName(QString::fromUtf8("StepsLabel"));
+
+        verticalLayout->addWidget(StepsLabel);
+
+        SubdivSteps = new QSpinBox(verticalLayoutWidget);
+        SubdivSteps->setObjectName(QString::fromUtf8("SubdivSteps"));
+
+        verticalLayout->addWidget(SubdivSteps);
+
         positionModeLabel = new QLabel(verticalLayoutWidget);
         positionModeLabel->setObjectName(QString::fromUtf8("positionModeLabel"));
         positionModeLabel->setMaximumSize(QSize(200, 20));
@@ -121,6 +127,19 @@ public:
         limitPositionCheckbox->setObjectName(QString::fromUtf8("limitPositionCheckbox"));
 
         verticalLayout->addWidget(limitPositionCheckbox);
+
+        tessallationLabel = new QLabel(verticalLayoutWidget);
+        tessallationLabel->setObjectName(QString::fromUtf8("tessallationLabel"));
+        tessallationLabel->setMaximumSize(QSize(200, 20));
+        tessallationLabel->setLayoutDirection(Qt::LeftToRight);
+        tessallationLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        verticalLayout->addWidget(tessallationLabel);
+
+        tessallationLevel = new QSpinBox(verticalLayoutWidget);
+        tessallationLevel->setObjectName(QString::fromUtf8("tessallationLevel"));
+
+        verticalLayout->addWidget(tessallationLevel);
 
 
         horizontalLayout->addWidget(SettingsGB);
@@ -147,6 +166,7 @@ public:
         positionModeLabel->setText(QApplication::translate("MainWindow", "Mode", nullptr));
         wireframeCheckbox->setText(QApplication::translate("MainWindow", "Wireframe", nullptr));
         limitPositionCheckbox->setText(QApplication::translate("MainWindow", "Limit position", nullptr));
+        tessallationLabel->setText(QApplication::translate("MainWindow", "Tessallation Levels", nullptr));
     } // retranslateUi
 
 };

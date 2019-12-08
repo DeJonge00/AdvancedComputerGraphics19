@@ -94,16 +94,6 @@ QGroupBox::title {
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QSpinBox" name="SubdivSteps">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>260</y>
-         <width>181</width>
-         <height>29</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="ImportOBJ">
        <property name="geometry">
         <rect>
@@ -117,29 +107,26 @@ QGroupBox::title {
         <string>Import OBJ file</string>
        </property>
       </widget>
-      <widget class="QLabel" name="StepsLabel">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>230</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Catmull-Clark steps</string>
-       </property>
-      </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
          <x>19</x>
-         <y>319</y>
+         <y>235</y>
          <width>181</width>
-         <height>101</height>
+         <height>171</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="StepsLabel">
+          <property name="text">
+           <string>Catmull-Clark steps</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="SubdivSteps"/>
+        </item>
         <item>
          <widget class="QLabel" name="positionModeLabel">
           <property name="maximumSize">
@@ -176,6 +163,28 @@ QGroupBox::title {
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLabel" name="tessallationLabel">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Tessallation Levels</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="tessallationLevel"/>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -192,6 +201,13 @@ QGroupBox::title {
    <class>MainView</class>
    <extends>QOpenGLWidget</extends>
    <header>mainview.h</header>
+   <slots>
+    <signal>updateSteps(int)</signal>
+    <signal>signal1()</signal>
+    <slot>setSteps(int)</slot>
+    <slot>setCombs(int)</slot>
+    <slot>setSelectedCircle(int)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>

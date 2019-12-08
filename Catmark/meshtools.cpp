@@ -36,7 +36,7 @@ QVector3D Mesh::calcFacePoint(HalfEdge* current) {
 }
 
 QVector<QVector3D> Mesh::getLimitPositions() {
-    qDebug() << "getLimitPositions start";
+//    qDebug() << "getLimitPositions start";
     QVector<QVector3D> vertexCoords = QVector<QVector3D>();
     for (int i = 0; i < vertices.size(); i++) {
         Vertex* currentVertex = &vertices[i];

@@ -37,6 +37,7 @@ public:
     void updateMeshBuffers(Mesh& currentMesh);
 
     bool positionModeLimit;
+    int tessallation;
 
 protected:
     void initializeGL();

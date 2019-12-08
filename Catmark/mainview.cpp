@@ -7,6 +7,7 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     wireframeMode = true;
     uniformUpdateRequired = true;
     positionModeLimit = false;
+    tessallation = 0;
 
     rotAngle = 0.0;
     FoV = 60.0;
@@ -34,6 +35,8 @@ void MainView::createShaderPrograms() {
 
     mainShaderProg = new QOpenGLShaderProgram();
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationControl, ":/shaders/tcs.glsl");
+    mainShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation, ":/shaders/tes.glsl");
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
 
     mainShaderProg->link();
@@ -124,6 +127,7 @@ void MainView::updateUniforms() {
     glUniformMatrix4fv(uniModelViewMatrix, 1, false, modelViewMatrix.data());
     glUniformMatrix4fv(uniProjectionMatrix, 1, false, projectionMatrix.data());
     glUniformMatrix3fv(uniNormalMatrix, 1, false, normalMatrix.data());
+    mainShaderProg->setUniformValue("tessallation", tessallation);
 
 }
 
@@ -207,8 +211,10 @@ void MainView::renderMesh() {
     if (wireframeMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
-    }
-    else {
+    } else if (tessallation > 0) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
+    } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glDrawElements(GL_TRIANGLE_FAN, meshIBOSize, GL_UNSIGNED_INT, 0);
     }
