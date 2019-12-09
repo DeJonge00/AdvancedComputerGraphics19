@@ -95,11 +95,16 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
     QVector<QVector3D>& vertexCoords = currentMesh.getVertexCoords();
     if (positionModeLimit) {
         vertexCoords = currentMesh.getLimitPositions();
+    } else if (tessellation) {
+        vertexCoords = currentMesh.getPatchesCoords();
     }
     QVector<QVector3D>& vertexNormals = currentMesh.getVertexNorms();
+    if (tessellation) {
+        vertexNormals = currentMesh.getPatchesNormals();
+    }
     QVector<unsigned int>& polyIndices = currentMesh.getPolyIndices();
     if (tessellation) {
-        polyIndices = currentMesh.getPatches();
+        polyIndices = currentMesh.getPatchesVertexIndices();
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, meshCoordsBO);
@@ -238,6 +243,7 @@ void MainView::renderMesh() {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
     } else if (tessellation) {
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
     } else {

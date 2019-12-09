@@ -2,7 +2,7 @@
 
 uniform int tessellation;
 
-layout (quads) in;
+layout (quads, equal_spacing, cw) in;
 
 in vec3 vertcoords_camera_tes[];
 in vec3 vertnormal_camera_tes[];

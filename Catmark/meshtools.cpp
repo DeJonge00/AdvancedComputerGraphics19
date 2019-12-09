@@ -63,9 +63,39 @@ QVector<unsigned int> Mesh::getPatches() {
                 h = h->next;
             }
         }
-        polyIndices.append(MAX_INT);
+        patches.append(MAX_INT);
     }
     return patches;
+}
+
+QVector<QVector3D> Mesh::getPatchesCoords() {
+    QVector<QVector3D> coords = QVector<QVector3D>();
+
+    for (int i = 0; i < faces.size(); i++) {
+        if (isRegularMeshFace(faces[i])) {
+            HalfEdge* h = faces[i].side;
+            for (int i = 0; i < faces[i].val; i++) {
+                coords.append(h->target->coords);
+                h = h->next;
+            }
+        }
+    }
+    return coords;
+}
+
+QVector<QVector3D> Mesh::getPatchesNormals() {
+    QVector<QVector3D> normals = QVector<QVector3D>();
+
+    for (int i = 0; i < faces.size(); i++) {
+        if (isRegularMeshFace(faces[i])) {
+            HalfEdge* h = faces[i].side;
+            for (int i = 0; i < faces[i].val; i++) {
+                normals.append(normals[h->target->index]);
+                h = h->next;
+            }
+        }
+    }
+    return normals;
 }
 
 QVector<QVector3D> Mesh::getLimitPositions() {

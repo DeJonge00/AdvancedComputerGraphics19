@@ -65,6 +65,7 @@ void MainWindow::on_tessellationEnabled_stateChanged(int value)
     ui->MainDisplay->tessellation = value == 2;
     ui->MainDisplay->uniformUpdateRequired = true;
     ui->MainDisplay->setMatrices();
+    ui->MainDisplay->updateMeshBuffers( Meshes[ui->SubdivSteps->value()] );
     ui->MainDisplay->update();
 }
 
