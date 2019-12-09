@@ -27,7 +27,9 @@ private slots:
     void on_SubdivSteps_valueChanged(int value);
     void on_wireframeCheckbox_stateChanged(int state);
     void on_limitPositionCheckbox_stateChanged(int state);
-    void on_tessallationLevel_valueChanged(int value);
+    void on_tessellationEnabled_stateChanged(int value);
+    void on_tessallationLevelOuter_valueChanged(int value);
+    void on_tessallationLevelInner_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;

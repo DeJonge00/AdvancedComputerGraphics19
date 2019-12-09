@@ -7,7 +7,9 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     wireframeMode = true;
     uniformUpdateRequired = true;
     positionModeLimit = false;
-    tessellation = 0;
+    tessellation = false;
+    inner_tessellation = 2;
+    outer_tessellation = 2;
 
     rotAngle = 0.0;
     FoV = 60.0;
@@ -50,7 +52,7 @@ void MainView::createShaderPrograms() {
 }
 
 void MainView::setMatrices() {
-    if (tessellation > 0) {
+    if (tessellation) {
         uniModelViewMatrix = glGetUniformLocation(tessShaderProg->programId(), "modelviewmatrix");
         uniProjectionMatrix = glGetUniformLocation(tessShaderProg->programId(), "projectionmatrix");
         uniNormalMatrix = glGetUniformLocation(tessShaderProg->programId(), "normalmatrix");
@@ -96,7 +98,7 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
     }
     QVector<QVector3D>& vertexNormals = currentMesh.getVertexNorms();
     QVector<unsigned int>& polyIndices = currentMesh.getPolyIndices();
-    if (tessellation > 0) {
+    if (tessellation) {
         polyIndices = currentMesh.getPatches();
     }
 
@@ -145,7 +147,10 @@ void MainView::updateUniforms(QOpenGLShaderProgram* shaderProg) {
     glUniformMatrix4fv(uniModelViewMatrix, 1, false, modelViewMatrix.data());
     glUniformMatrix4fv(uniProjectionMatrix, 1, false, projectionMatrix.data());
     glUniformMatrix3fv(uniNormalMatrix, 1, false, normalMatrix.data());
-    shaderProg->setUniformValue("tessellation", tessellation);
+    shaderProg->setUniformValue("inner_tessellation", inner_tessellation);
+    shaderProg->setUniformValue("outer_tessellation", outer_tessellation);
+
+    uniformUpdateRequired = false;
 }
 
 // ---
@@ -207,7 +212,7 @@ void MainView::paintGL() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         QOpenGLShaderProgram* shaderProg = mainShaderProg;
-        if (tessellation > 0) {
+        if (tessellation) {
             shaderProg = tessShaderProg;
         }
         shaderProg->bind();
@@ -232,7 +237,7 @@ void MainView::renderMesh() {
     if (wireframeMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
-    } else if (tessellation > 0) {
+    } else if (tessellation) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
     } else {

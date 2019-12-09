@@ -113,10 +113,10 @@ QGroupBox::title {
          <x>19</x>
          <y>235</y>
          <width>181</width>
-         <height>171</height>
+         <height>111</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="catmulClarkVLayout">
         <item>
          <widget class="QLabel" name="StepsLabel">
           <property name="text">
@@ -163,6 +163,18 @@ QGroupBox::title {
           </property>
          </widget>
         </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>360</y>
+         <width>181</width>
+         <height>86</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="tessellationVLayout">
         <item>
          <widget class="QLabel" name="tessallationLabel">
           <property name="maximumSize">
@@ -183,7 +195,49 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="tessallationLevel"/>
+         <widget class="QCheckBox" name="tessellationEnabled">
+          <property name="text">
+           <string>Enable</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="tessallationLevelInner">
+          <property name="suffix">
+           <string> levels</string>
+          </property>
+          <property name="prefix">
+           <string>Inner: </string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="tessallationLevelOuter">
+          <property name="suffix">
+           <string> levels</string>
+          </property>
+          <property name="prefix">
+           <string>Outer: </string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

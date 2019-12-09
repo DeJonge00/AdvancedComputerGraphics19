@@ -60,10 +60,24 @@ void MainWindow::on_limitPositionCheckbox_stateChanged(int state)
     ui->MainDisplay->update();
 }
 
-void MainWindow::on_tessallationLevel_valueChanged(int value)
+void MainWindow::on_tessellationEnabled_stateChanged(int value)
 {
-    ui->MainDisplay->tessellation = value;
+    ui->MainDisplay->tessellation = value == 2;
     ui->MainDisplay->uniformUpdateRequired = true;
     ui->MainDisplay->setMatrices();
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_tessallationLevelOuter_valueChanged(int value)
+{
+    ui->MainDisplay->outer_tessellation = value;
+    ui->MainDisplay->uniformUpdateRequired = true;
+    ui->MainDisplay->update();
+}
+
+void MainWindow::on_tessallationLevelInner_valueChanged(int value)
+{
+    ui->MainDisplay->inner_tessellation = value;
+    ui->MainDisplay->uniformUpdateRequired = true;
     ui->MainDisplay->update();
 }

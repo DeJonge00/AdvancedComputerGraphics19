@@ -38,7 +38,8 @@ public:
     void setMatrices();
 
     bool positionModeLimit;
-    int tessellation;
+    bool tessellation;
+    int inner_tessellation, outer_tessellation;
 
 protected:
     void initializeGL();

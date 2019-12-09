@@ -35,14 +35,18 @@ public:
     QDial *RotationDial;
     QPushButton *ImportOBJ;
     QWidget *verticalLayoutWidget;
-    QVBoxLayout *verticalLayout;
+    QVBoxLayout *catmulClarkVLayout;
     QLabel *StepsLabel;
     QSpinBox *SubdivSteps;
     QLabel *positionModeLabel;
     QCheckBox *wireframeCheckbox;
     QCheckBox *limitPositionCheckbox;
+    QWidget *verticalLayoutWidget_2;
+    QVBoxLayout *tessellationVLayout;
     QLabel *tessallationLabel;
-    QSpinBox *tessallationLevel;
+    QCheckBox *tessellationEnabled;
+    QSpinBox *tessallationLevelInner;
+    QSpinBox *tessallationLevelOuter;
     MainView *MainDisplay;
 
     void setupUi(QMainWindow *MainWindow)
@@ -93,21 +97,21 @@ public:
         ImportOBJ->setGeometry(QRect(20, 40, 181, 28));
         verticalLayoutWidget = new QWidget(SettingsGB);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(19, 235, 181, 171));
-        verticalLayout = new QVBoxLayout(verticalLayoutWidget);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayoutWidget->setGeometry(QRect(19, 235, 181, 111));
+        catmulClarkVLayout = new QVBoxLayout(verticalLayoutWidget);
+        catmulClarkVLayout->setSpacing(6);
+        catmulClarkVLayout->setContentsMargins(11, 11, 11, 11);
+        catmulClarkVLayout->setObjectName(QString::fromUtf8("catmulClarkVLayout"));
+        catmulClarkVLayout->setContentsMargins(0, 0, 0, 0);
         StepsLabel = new QLabel(verticalLayoutWidget);
         StepsLabel->setObjectName(QString::fromUtf8("StepsLabel"));
 
-        verticalLayout->addWidget(StepsLabel);
+        catmulClarkVLayout->addWidget(StepsLabel);
 
         SubdivSteps = new QSpinBox(verticalLayoutWidget);
         SubdivSteps->setObjectName(QString::fromUtf8("SubdivSteps"));
 
-        verticalLayout->addWidget(SubdivSteps);
+        catmulClarkVLayout->addWidget(SubdivSteps);
 
         positionModeLabel = new QLabel(verticalLayoutWidget);
         positionModeLabel->setObjectName(QString::fromUtf8("positionModeLabel"));
@@ -115,31 +119,55 @@ public:
         positionModeLabel->setLayoutDirection(Qt::LeftToRight);
         positionModeLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        verticalLayout->addWidget(positionModeLabel);
+        catmulClarkVLayout->addWidget(positionModeLabel);
 
         wireframeCheckbox = new QCheckBox(verticalLayoutWidget);
         wireframeCheckbox->setObjectName(QString::fromUtf8("wireframeCheckbox"));
         wireframeCheckbox->setChecked(true);
 
-        verticalLayout->addWidget(wireframeCheckbox);
+        catmulClarkVLayout->addWidget(wireframeCheckbox);
 
         limitPositionCheckbox = new QCheckBox(verticalLayoutWidget);
         limitPositionCheckbox->setObjectName(QString::fromUtf8("limitPositionCheckbox"));
 
-        verticalLayout->addWidget(limitPositionCheckbox);
+        catmulClarkVLayout->addWidget(limitPositionCheckbox);
 
-        tessallationLabel = new QLabel(verticalLayoutWidget);
+        verticalLayoutWidget_2 = new QWidget(SettingsGB);
+        verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
+        verticalLayoutWidget_2->setGeometry(QRect(20, 360, 181, 86));
+        tessellationVLayout = new QVBoxLayout(verticalLayoutWidget_2);
+        tessellationVLayout->setSpacing(6);
+        tessellationVLayout->setContentsMargins(11, 11, 11, 11);
+        tessellationVLayout->setObjectName(QString::fromUtf8("tessellationVLayout"));
+        tessellationVLayout->setContentsMargins(0, 0, 0, 0);
+        tessallationLabel = new QLabel(verticalLayoutWidget_2);
         tessallationLabel->setObjectName(QString::fromUtf8("tessallationLabel"));
         tessallationLabel->setMaximumSize(QSize(200, 20));
         tessallationLabel->setLayoutDirection(Qt::LeftToRight);
         tessallationLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        verticalLayout->addWidget(tessallationLabel);
+        tessellationVLayout->addWidget(tessallationLabel);
 
-        tessallationLevel = new QSpinBox(verticalLayoutWidget);
-        tessallationLevel->setObjectName(QString::fromUtf8("tessallationLevel"));
+        tessellationEnabled = new QCheckBox(verticalLayoutWidget_2);
+        tessellationEnabled->setObjectName(QString::fromUtf8("tessellationEnabled"));
 
-        verticalLayout->addWidget(tessallationLevel);
+        tessellationVLayout->addWidget(tessellationEnabled);
+
+        tessallationLevelInner = new QSpinBox(verticalLayoutWidget_2);
+        tessallationLevelInner->setObjectName(QString::fromUtf8("tessallationLevelInner"));
+        tessallationLevelInner->setMinimum(1);
+        tessallationLevelInner->setMaximum(10);
+        tessallationLevelInner->setValue(2);
+
+        tessellationVLayout->addWidget(tessallationLevelInner);
+
+        tessallationLevelOuter = new QSpinBox(verticalLayoutWidget_2);
+        tessallationLevelOuter->setObjectName(QString::fromUtf8("tessallationLevelOuter"));
+        tessallationLevelOuter->setMinimum(1);
+        tessallationLevelOuter->setMaximum(10);
+        tessallationLevelOuter->setValue(2);
+
+        tessellationVLayout->addWidget(tessallationLevelOuter);
 
 
         horizontalLayout->addWidget(SettingsGB);
@@ -167,6 +195,11 @@ public:
         wireframeCheckbox->setText(QApplication::translate("MainWindow", "Wireframe", nullptr));
         limitPositionCheckbox->setText(QApplication::translate("MainWindow", "Limit position", nullptr));
         tessallationLabel->setText(QApplication::translate("MainWindow", "Tessallation Levels", nullptr));
+        tessellationEnabled->setText(QApplication::translate("MainWindow", "Enable", nullptr));
+        tessallationLevelInner->setSuffix(QApplication::translate("MainWindow", " levels", nullptr));
+        tessallationLevelInner->setPrefix(QApplication::translate("MainWindow", "Inner: ", nullptr));
+        tessallationLevelOuter->setSuffix(QApplication::translate("MainWindow", " levels", nullptr));
+        tessallationLevelOuter->setPrefix(QApplication::translate("MainWindow", "Outer: ", nullptr));
     } // retranslateUi
 
 };
