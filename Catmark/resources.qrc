@@ -4,5 +4,6 @@
         <file>shaders/vertshader.glsl</file>
         <file>shaders/tcs.glsl</file>
         <file>shaders/tes.glsl</file>
+        <file>shaders/vertshader_t.glsl</file>
     </qresource>
 </RCC>
