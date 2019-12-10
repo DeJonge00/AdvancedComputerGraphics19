@@ -25,9 +25,9 @@ public:
     inline QVector<QVector3D>& getVertexCoords() { return vertexCoords; }
     inline QVector<QVector3D>& getVertexNorms() { return vertexNormals; }
     inline QVector<unsigned int>& getPolyIndices() { return polyIndices; }
-    QVector<unsigned int> getPatchesVertexIndices();
-    QVector<QVector3D> getPatchesCoords();
-    QVector<QVector3D> getPatchesNormals();
+    QVector<unsigned int> getPatchesVertexIndices(int nr_patches);
+    QVector<QVector3D> getPatchesCoords(int nr_patches);
+    QVector<QVector3D> getPatchesNormals(int nr_patches);
 
     QVector<QVector3D> getLimitPositions();
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
+    <width>1400</width>
     <height>768</height>
    </rect>
   </property>
@@ -169,7 +169,7 @@ QGroupBox::title {
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>360</y>
+         <y>550</y>
          <width>181</width>
          <height>86</height>
         </rect>
@@ -240,6 +240,58 @@ QGroupBox::title {
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget_3">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>650</y>
+         <width>181</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="patchVerticesCount">
+        <item>
+         <widget class="QLabel" name="patchVerticesLabel">
+          <property name="text">
+           <string>Amount of patch vertices</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="patchVertices4">
+          <property name="text">
+           <string>4</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="patchVertices16">
+          <property name="text">
+           <string>16</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>26</x>
+         <y>520</y>
+         <width>171</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Unfinished</string>
+       </property>
       </widget>
      </widget>
     </item>

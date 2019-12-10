@@ -14,11 +14,13 @@ void main() {
     vertcoords_camera_tes[gl_InvocationID] = vertcoords_camera_tcs[gl_InvocationID];
     vertnormal_camera_tes[gl_InvocationID] = vertnormal_camera_tcs[gl_InvocationID];
 
-    gl_TessLevelOuter[0] = outer_tessellation;
-    gl_TessLevelOuter[1] = outer_tessellation;
-    gl_TessLevelOuter[2] = outer_tessellation;
-    gl_TessLevelOuter[3] = outer_tessellation;
+    if (gl_InvocationID == 0) {
+        gl_TessLevelOuter[0] = outer_tessellation;
+        gl_TessLevelOuter[1] = outer_tessellation;
+        gl_TessLevelOuter[2] = outer_tessellation;
+        gl_TessLevelOuter[3] = outer_tessellation;
 
-    gl_TessLevelInner[0] = inner_tessellation;
-    gl_TessLevelInner[1] = inner_tessellation;
+        gl_TessLevelInner[0] = inner_tessellation;
+        gl_TessLevelInner[1] = inner_tessellation;
+    }
 }

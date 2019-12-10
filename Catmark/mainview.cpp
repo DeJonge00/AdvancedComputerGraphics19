@@ -10,6 +10,7 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
     tessellation = false;
     inner_tessellation = 2;
     outer_tessellation = 2;
+    nr_patch_vertices = 4;
 
     rotAngle = 0.0;
     FoV = 60.0;
@@ -18,10 +19,10 @@ MainView::MainView(QWidget *Parent) : QOpenGLWidget(Parent) {
 MainView::~MainView() {
     qDebug() << "✗✗ MainView destructor";
 
-    glDeleteBuffers(1, &meshCoordsBO);
     glDeleteBuffers(1, &meshNormalsBO);
     glDeleteBuffers(1, &meshIndexBO);
     glDeleteVertexArrays(1, &meshVAO);
+    glDeleteBuffers(1, &meshCoordsBO);
 
     makeCurrent();
     debugLogger->stopLogging();
@@ -42,7 +43,7 @@ void MainView::createShaderPrograms() {
     mainShaderProg->link();
 
     tessShaderProg = new QOpenGLShaderProgram();
-    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    tessShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader_t.glsl");
     tessShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationControl, ":/shaders/tcs.glsl");
     tessShaderProg->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation, ":/shaders/tes.glsl");
     tessShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
@@ -92,20 +93,19 @@ void MainView::updateMeshBuffers(Mesh& currentMesh) {
 
     //gather attributes for current mesh
     currentMesh.extractAttributes();
-    QVector<QVector3D>& vertexCoords = currentMesh.getVertexCoords();
-    if (positionModeLimit) {
-        vertexCoords = currentMesh.getLimitPositions();
-    } else if (tessellation) {
-        vertexCoords = currentMesh.getPatchesCoords();
-    }
-    QVector<QVector3D>& vertexNormals = currentMesh.getVertexNorms();
-    if (tessellation) {
-        vertexNormals = currentMesh.getPatchesNormals();
-    }
-    QVector<unsigned int>& polyIndices = currentMesh.getPolyIndices();
-    if (tessellation) {
-        polyIndices = currentMesh.getPatchesVertexIndices();
-    }
+
+    QVector<QVector3D>& vertexNormals = *(new QVector<QVector3D>());
+    if (tessellation) { vertexNormals = currentMesh.getPatchesNormals(nr_patch_vertices); }
+    else { vertexNormals = currentMesh.getVertexNorms(); }
+
+    QVector<unsigned int>& polyIndices = *(new QVector<unsigned int>());
+    if (tessellation) { polyIndices = currentMesh.getPatchesVertexIndices(nr_patch_vertices); }
+    else { polyIndices = currentMesh.getPolyIndices(); }
+
+    QVector<QVector3D>& vertexCoords = *(new QVector<QVector3D>());
+    if (tessellation) {vertexCoords = currentMesh.getPatchesCoords(nr_patch_vertices); }
+    else if (positionModeLimit) { vertexCoords = currentMesh.getLimitPositions(); }
+    else { vertexCoords = currentMesh.getVertexCoords(); }
 
     glBindBuffer(GL_ARRAY_BUFFER, meshCoordsBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(QVector3D)*vertexCoords.size(), vertexCoords.data(), GL_DYNAMIC_DRAW);
@@ -187,6 +187,10 @@ void MainView::initializeGL() {
 
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(MAX_INT);
+
+    GLint MaxPatchVertices = 0;
+    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+    qDebug() << "Maximum patch vertices:" << MaxPatchVertices;
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     // ---
@@ -239,13 +243,14 @@ void MainView::renderMesh() {
 
     glBindVertexArray(meshVAO);
 
-    if (wireframeMode) {
+     if (tessellation) {
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+//        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+//        glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_PATCHES, 0, meshIBOSize);
+    } else if (wireframeMode) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawElements(GL_LINE_LOOP, meshIBOSize, GL_UNSIGNED_INT, 0);
-    } else if (tessellation) {
-        glPatchParameteri(GL_PATCH_VERTICES, 4);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glDrawElements(GL_PATCHES, meshIBOSize, GL_UNSIGNED_INT, 0);
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glDrawElements(GL_TRIANGLE_FAN, meshIBOSize, GL_UNSIGNED_INT, 0);

@@ -31,6 +31,9 @@ private slots:
     void on_tessallationLevelOuter_valueChanged(int value);
     void on_tessallationLevelInner_valueChanged(int value);
 
+    void on_patchVertices4_toggled(bool checked);
+    void on_patchVertices16_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
 };

@@ -39,7 +39,7 @@ public:
 
     bool positionModeLimit;
     bool tessellation;
-    int inner_tessellation, outer_tessellation;
+    int inner_tessellation, outer_tessellation, nr_patch_vertices;
 
 protected:
     void initializeGL();
@@ -65,8 +65,8 @@ private:
 
     QOpenGLShaderProgram* mainShaderProg, *tessShaderProg;
 
-    GLuint meshVAO, meshCoordsBO, meshNormalsBO, meshIndexBO, patchesBO;
-    unsigned int meshIBOSize, patchesIBOSize;
+    GLuint meshVAO, meshCoordsBO, meshNormalsBO, meshIndexBO;
+    unsigned int meshIBOSize;
 
     // ---
 

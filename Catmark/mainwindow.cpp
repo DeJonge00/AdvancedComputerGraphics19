@@ -39,18 +39,21 @@ void MainWindow::on_RotationDial_valueChanged(int value) {
 void MainWindow::on_SubdivSteps_valueChanged(int value) {
     unsigned short k;
 
-    for (k=Meshes.size(); k<value+1; k++) {
-        Meshes.append(Mesh());
-        Meshes[k-1].subdivideCatmullClark(Meshes[k]);
+    if (ui->MainDisplay->modelLoaded)  {
+        for (k=Meshes.size(); k<value+1; k++) {
+            Meshes.append(Mesh());
+            Meshes[k-1].subdivideCatmullClark(Meshes[k]);
+        }
+        ui->MainDisplay->updateMeshBuffers( Meshes[value] );
     }
-
-    ui->MainDisplay->updateMeshBuffers( Meshes[value] );
 }
 
 void MainWindow::on_wireframeCheckbox_stateChanged(int state)
 {
     ui->MainDisplay->wireframeMode = state == 2;
-    ui->MainDisplay->update();
+    if (ui->MainDisplay->modelLoaded) {
+        ui->MainDisplay->update();
+    }
 }
 
 void MainWindow::on_limitPositionCheckbox_stateChanged(int state)
@@ -64,9 +67,11 @@ void MainWindow::on_tessellationEnabled_stateChanged(int value)
 {
     ui->MainDisplay->tessellation = value == 2;
     ui->MainDisplay->uniformUpdateRequired = true;
-    ui->MainDisplay->setMatrices();
-    ui->MainDisplay->updateMeshBuffers( Meshes[ui->SubdivSteps->value()] );
-    ui->MainDisplay->update();
+    if (ui->MainDisplay->modelLoaded) {
+        ui->MainDisplay->setMatrices();
+        ui->MainDisplay->updateMeshBuffers( Meshes[ui->SubdivSteps->value()] );
+        ui->MainDisplay->update();
+    }
 }
 
 void MainWindow::on_tessallationLevelOuter_valueChanged(int value)
@@ -81,4 +86,14 @@ void MainWindow::on_tessallationLevelInner_valueChanged(int value)
     ui->MainDisplay->inner_tessellation = value;
     ui->MainDisplay->uniformUpdateRequired = true;
     ui->MainDisplay->update();
+}
+
+void MainWindow::on_patchVertices16_toggled(bool checked)
+{
+    if (checked) { ui->MainDisplay->nr_patch_vertices = 4; }
+}
+
+void MainWindow::on_patchVertices4_toggled(bool checked)
+{
+    if (checked) { ui->MainDisplay->nr_patch_vertices = 4; }
 }

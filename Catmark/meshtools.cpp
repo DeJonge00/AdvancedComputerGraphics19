@@ -51,47 +51,87 @@ bool isRegularMeshFace(Face f) {
     return true;
 }
 
+bool nineRegularMeshFaces(Face f) {
+    if (f.val != 4) {
+        return false;
+    }
+    HalfEdge *start = f.side, *current = f.side;
+    do {
+        if ((current->twin->next->next->next->next != current->twin) || (current->twin->next->twin->next->next->next->next != current->twin->next->twin)) {
+            return false;
+        }
+        current = current->next;
+    } while (current != start);
+    return true;
+}
+
 // Construct array of patches consisting of vertice coordinates
-QVector<unsigned int> Mesh::getPatches() {
+QVector<unsigned int> Mesh::getPatchesVertexIndices(int nr_patches) {
     QVector<unsigned int> patches = QVector<unsigned int>();
 
     for (int i = 0; i < faces.size(); i++) {
-        if (isRegularMeshFace(faces[i])) {
-            HalfEdge* h = faces[i].side;
-            for (int i = 0; i < faces[i].val; i++) {
-                patches.append(h->target->index);
-                h = h->next;
+        if (nr_patches == 4) {
+            if (isRegularMeshFace(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                for (int i = 0; i < faces[i].val; i++) {
+                    patches.append(h->target->index);
+                    h = h->next;
+                }
             }
         }
-        patches.append(MAX_INT);
+
+        if (nr_patches == 16) {
+            if (nineRegularMeshFaces(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                // Append 16 vertices, top-left to bottom-right
+            }
+        }
     }
     return patches;
 }
 
-QVector<QVector3D> Mesh::getPatchesCoords() {
+QVector<QVector3D> Mesh::getPatchesCoords(int nr_patches) {
     QVector<QVector3D> coords = QVector<QVector3D>();
 
     for (int i = 0; i < faces.size(); i++) {
-        if (isRegularMeshFace(faces[i])) {
-            HalfEdge* h = faces[i].side;
-            for (int i = 0; i < faces[i].val; i++) {
-                coords.append(h->target->coords);
-                h = h->next;
+        if (nr_patches == 4) {
+            if (isRegularMeshFace(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                for (int i = 0; i < faces[i].val; i++) {
+                    coords.append(h->target->coords);
+                    h = h->next;
+                }
+            }
+        }
+
+        if (nr_patches == 16) {
+            if (nineRegularMeshFaces(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                // Append 16 vertice-coords, top-left to bottom-right
             }
         }
     }
     return coords;
 }
 
-QVector<QVector3D> Mesh::getPatchesNormals() {
+QVector<QVector3D> Mesh::getPatchesNormals(int nr_patches) {
     QVector<QVector3D> normals = QVector<QVector3D>();
 
     for (int i = 0; i < faces.size(); i++) {
-        if (isRegularMeshFace(faces[i])) {
-            HalfEdge* h = faces[i].side;
-            for (int i = 0; i < faces[i].val; i++) {
-                normals.append(normals[h->target->index]);
-                h = h->next;
+        if (nr_patches == 4) {
+            if (isRegularMeshFace(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                for (int i = 0; i < faces[i].val; i++) {
+                    normals.append(normals[h->target->index]);
+                    h = h->next;
+                }
+            }
+        }
+
+        if (nr_patches == 16) {
+            if (nineRegularMeshFaces(faces[i])) {
+                HalfEdge* h = faces[i].side;
+                // Append 16 vertice-normals, top-left to bottom-right
             }
         }
     }

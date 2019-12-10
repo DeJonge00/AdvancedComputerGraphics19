@@ -8,12 +8,12 @@ uniform mat4 modelviewmatrix;
 uniform mat4 projectionmatrix;
 uniform mat3 normalmatrix;
 
-out vec3 vertcoords_camera_tcs;
-out vec3 vertnormal_camera_tcs;
+out vec3 vertcoords_camera_fs;
+out vec3 vertnormal_camera_fs;
 
 void main() {
   gl_Position = projectionmatrix * modelviewmatrix * vec4(vertcoords_world_vs, 1.0);
 
-  vertcoords_camera_tcs = vec3(modelviewmatrix * vec4(vertcoords_world_vs, 1.0));
-  vertnormal_camera_tcs = normalize(normalmatrix * vertnormal_world_vs);
+  vertcoords_camera_fs = vec3(modelviewmatrix * vec4(vertcoords_world_vs, 1.0));
+  vertnormal_camera_fs = normalize(normalmatrix * vertnormal_world_vs);
 }
