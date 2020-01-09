@@ -242,7 +242,7 @@ QVector3D edgePoint(HalfEdge* firstEdge) {
         currentEdge = firstEdge;
     }
 
-    if (currentEdge->polygon == nullptr) {
+    if ((currentEdge->polygon == nullptr) || (currentEdge->sharpness > 0)) {
         EdgePt = 0.5 * currentEdge->target->coords;
         EdgePt += 0.5 * currentEdge->twin->target->coords;
     } else {
@@ -276,7 +276,7 @@ void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHa
     for (unsigned int k = 0; k < halfEdges.size(); ++k) {
         HalfEdge* currentEdge = &halfEdges[k];
 
-        if (!boundaryEdges.contains(currentEdge)) {
+//        if (!boundaryEdges.contains(currentEdge)) {
             unsigned int m = currentEdge->twin->index;
 
             // Target, Next, Prev, Twin, Poly, Index
@@ -309,7 +309,7 @@ void Mesh::splitHalfEdges(QVector<Vertex>& newVertices, QVector<HalfEdge>& newHa
                 newHalfEdges[2*m].twin = &newHalfEdges[2*k+1];
                 newHalfEdges[2*m+1].twin = &newHalfEdges[2*k];
             }
-        }
+//        }
     }
 
     // Note that Next, Prev and Poly are not yet assigned at this point.

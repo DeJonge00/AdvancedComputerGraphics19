@@ -28,7 +28,7 @@ public:
         sharpness = 0;
     }
 
-    HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness=0) {
+    HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness=1) {
         target = htarget;
         next = hnext;
         prev = hprev;
